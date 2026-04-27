@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 
 import '../models/mood_record_model.dart';
 import '../services/mood_service.dart';
+import 'auth_controller.dart';
 
 /// 心情控制器
 class MoodController extends GetxController {
@@ -233,14 +234,4 @@ class MoodController extends GetxController {
       return '${date.month}月${date.day}日';
     }
   }
-}
-
-// 导入 AuthController（避免循环引用，通过 Get.find 获取）
-class AuthController extends GetxController {
-  Rx<UserModel?> currentUser = Rx<UserModel?>(null);
-}
-
-class UserModel extends GetxController {
-  final String id;
-  UserModel({required this.id});
 }
