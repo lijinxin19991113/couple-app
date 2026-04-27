@@ -283,6 +283,7 @@ class _AnniversaryFormPageState extends State<AnniversaryFormPage> {
       },
     );
     if (date != null) {
+      if (!mounted) return;
       setState(() => _selectedDate = date);
     }
   }
@@ -302,6 +303,7 @@ class _AnniversaryFormPageState extends State<AnniversaryFormPage> {
       },
     );
     if (time != null) {
+      if (!mounted) return;
       setState(() => _reminderTime = time);
     }
   }

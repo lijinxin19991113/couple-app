@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../config/colors.dart';
 import '../config/routes.dart';
 import '../controllers/album_controller.dart';
+import '../models/album_photo_model.dart';
 
 /// 相册列表页
 class AlbumPage extends StatefulWidget {
@@ -97,7 +98,7 @@ class _AlbumPageState extends State<AlbumPage> {
   }
 
   /// 月份分组区块
-  Widget _buildMonthSection(String yearMonth, List photos) {
+  Widget _buildMonthSection(String yearMonth, List<AlbumPhoto> photos) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -133,13 +134,13 @@ class _AlbumPageState extends State<AlbumPage> {
   }
 
   /// 照片缩略图
-  Widget _buildPhotoThumbnail(dynamic photo) {
+  Widget _buildPhotoThumbnail(AlbumPhoto photo) {
     return GestureDetector(
       onTap: () => _navigateToPhotoView(photo.objectId),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(8),
         child: Image.network(
-          photo.thumbnailUrl ?? photo.photoUrl,
+          photo.thumbnailUrl,
           fit: BoxFit.cover,
           loadingBuilder: (context, child, loadingProgress) {
             if (loadingProgress == null) return child;

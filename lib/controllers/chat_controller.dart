@@ -92,10 +92,10 @@ class ChatController extends GetxController {
 
     try {
       final message = await _chatService.sendTextMessage(
-        relation,
-        content.trim(),
+        relationId: relation,
         senderId: currentUser.id,
         receiverId: partner.id,
+        content: content.trim(),
       );
 
       if (_isMounted) {
@@ -131,11 +131,11 @@ class ChatController extends GetxController {
 
     try {
       final message = await _chatService.sendImageMessage(
-        relation,
-        localFilePath,
+        relationId: relation,
         caption: caption,
         senderId: currentUser.id,
         receiverId: partner.id,
+        localPath: localFilePath,
       );
 
       if (_isMounted) {
@@ -160,12 +160,14 @@ class ChatController extends GetxController {
     if (!_isMounted) return;
 
     final relation = _userController.coupleRelation.value?.id;
-    if (relation == null) return;
+    final currentUser = _userController.currentUser.value;
+    if (relation == null || currentUser == null) return;
 
     try {
-      if (lastReadMsgId != null) {
-        await _chatService.markMessagesAsRead(relation, lastReadMsgId);
-      }
+      await _chatService.markMessagesAsRead(
+        relationId: relation,
+        readerId: currentUser.id,
+      );
 
       // 更新本地未读数
       if (_isMounted) {
@@ -184,7 +186,14 @@ class ChatController extends GetxController {
     if (relation == null) return;
 
     try {
-      final count = await _chatService.getUnreadCount(relation);
+      final currentUser = _userController.currentUser.value;
+      if (currentUser == null) {
+        return;
+      }
+      final count = await _chatService.getUnreadCount(
+        relationId: relation,
+        receiverId: currentUser.id,
+      );
       if (_isMounted) {
         unreadCount.value = count;
       }

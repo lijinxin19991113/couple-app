@@ -40,6 +40,9 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void dispose() {
     _chatController.stopListeningNewMessages();
+    if (Get.isRegistered<ChatController>()) {
+      Get.delete<ChatController>();
+    }
     _inputController.dispose();
     _scrollController.dispose();
     _inputFocusNode.dispose();
@@ -61,9 +64,17 @@ class _ChatPageState extends State<ChatPage> {
     if (content.isEmpty) return;
 
     _inputController.clear();
-    await _chatController.sendTextMessage(content);
+    try {
+      await _chatController.sendTextMessage(content);
+    } catch (e) {
+      if (mounted) {
+        Get.snackbar('提示', '发送失败，请重试');
+      }
+    }
+    if (!mounted) return;
 
     await Future.delayed(const Duration(milliseconds: 100));
+    if (!mounted) return;
     _scrollToBottom();
   }
 

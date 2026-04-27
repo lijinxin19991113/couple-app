@@ -67,6 +67,9 @@ class MoodRecord extends Equatable {
     if (value is DateTime) {
       return value;
     }
+    if (value is int) {
+      return DateTime.fromMillisecondsSinceEpoch(value);
+    }
     if (value is String) {
       return DateTime.tryParse(value);
     }
@@ -131,4 +134,55 @@ class MoodRecord extends Equatable {
         createdAt,
         updatedAt,
       ];
+}
+
+extension MoodTypeX on MoodType {
+  String get label {
+    switch (this) {
+      case MoodType.happy:
+        return '开心';
+      case MoodType.excited:
+        return '兴奋';
+      case MoodType.calm:
+        return '平静';
+      case MoodType.worried:
+        return '担心';
+      case MoodType.sad:
+        return '难过';
+      case MoodType.angry:
+        return '生气';
+    }
+  }
+
+  String get emoji {
+    switch (this) {
+      case MoodType.happy:
+        return '😊';
+      case MoodType.excited:
+        return '🤩';
+      case MoodType.calm:
+        return '😌';
+      case MoodType.worried:
+        return '😟';
+      case MoodType.sad:
+        return '😢';
+      case MoodType.angry:
+        return '😠';
+    }
+  }
+}
+
+extension MoodRecordX on MoodRecord {
+  String get moodEmoji => moodType.emoji;
+
+  String? get contentPreview {
+    final text = content?.trim();
+    if (text == null || text.isEmpty) {
+      return null;
+    }
+    if (text.length <= 40) {
+      return text;
+    }
+    return '${text.substring(0, 40)}...';
+  }
 }

@@ -16,21 +16,18 @@ class AnniversaryController extends GetxController {
   /// 当前关系 ID
   String? _relationId;
 
+  bool get _isAlive => !isClosed;
+
   @override
   void onInit() {
     super.onInit();
-    // 尝试从 UserController 获取 relationId
     _loadRelationId();
   }
 
   /// 加载关系 ID
   Future<void> _loadRelationId() async {
-    // TODO: 从 UserController 获取当前关系 ID
-    // final userController = Get.find<UserController>();
-    // _relationId = userController.currentRelation.value?.id;
-    // if (_relationId != null) {
-    //   await loadAnniversaries();
-    // }
+    _relationId = 'relation_001';
+    await loadAnniversaries();
   }
 
   /// 设置关系 ID 并加载数据
@@ -41,21 +38,20 @@ class AnniversaryController extends GetxController {
 
   /// 加载纪念日列表
   Future<void> loadAnniversaries() async {
-    if (_relationId == null) return;
-    if (!isMounted) return;
+    if (_relationId == null || !_isAlive) return;
 
     isLoading.value = true;
     try {
-      final list = await _service.getAnniversaryList(_relationId!);
-      if (isMounted) {
+      final list = await _service.getAnniversaryList(relationId: _relationId!);
+      if (_isAlive) {
         anniversaries.value = list;
       }
     } catch (e) {
-      if (isMounted) {
+      if (_isAlive) {
         Get.snackbar('提示', '加载纪念日失败');
       }
     } finally {
-      if (isMounted) {
+      if (_isAlive) {
         isLoading.value = false;
       }
     }
@@ -71,11 +67,12 @@ class AnniversaryController extends GetxController {
     DateTime? reminderTime,
     String? note,
   }) async {
-    if (_relationId == null) return false;
-    if (!isMounted) return false;
+    if (_relationId == null || !_isAlive) return false;
 
     try {
-      final anniversary = await _service.createAnniversary(
+      final now = DateTime.now();
+      final draft = Anniversary(
+        objectId: '',
         relationId: _relationId!,
         title: title,
         date: date,
@@ -84,17 +81,22 @@ class AnniversaryController extends GetxController {
         reminderEnabled: reminderEnabled,
         reminderTime: reminderTime,
         note: note,
+        createdBy: 'mock_user_001',
+        createdAt: now,
+        updatedAt: now,
       );
+      final created = await _service.createAnniversary(anniversary: draft);
 
-      if (anniversary != null && isMounted) {
-        anniversaries.add(anniversary);
-        anniversaries.sort((a, b) => a.date.compareTo(b.date));
+      if (_isAlive) {
+        anniversaries.add(created);
+        anniversaries.sort(
+          (a, b) => _service.calculateCountdown(a).compareTo(_service.calculateCountdown(b)),
+        );
         Get.snackbar('成功', '纪念日已创建');
-        return true;
       }
-      return false;
+      return true;
     } catch (e) {
-      if (isMounted) {
+      if (_isAlive) {
         Get.snackbar('提示', '创建失败，请稍后重试');
       }
       return false;
@@ -103,18 +105,34 @@ class AnniversaryController extends GetxController {
 
   /// 更新纪念日
   Future<bool> updateAnniversary(String id, Map<String, dynamic> updates) async {
-    if (!isMounted) return false;
+    if (!_isAlive) return false;
+    final index = anniversaries.indexWhere((item) => item.objectId == id);
+    if (index < 0) return false;
 
     try {
-      final success = await _service.updateAnniversary(id, updates);
-      if (success && isMounted) {
-        await loadAnniversaries();
+      final current = anniversaries[index];
+      final updatedDraft = current.copyWith(
+        title: updates['title'] as String?,
+        date: updates['date'] as DateTime?,
+        type: updates['type'] as AnniversaryType?,
+        repeatType: updates['repeatType'] as AnniversaryRepeatType?,
+        reminderEnabled: updates['reminderEnabled'] as bool?,
+        reminderTime: updates['reminderTime'] as DateTime?,
+        note: updates['note'] as String?,
+      );
+      final updated = await _service.updateAnniversary(anniversary: updatedDraft);
+      if (updated == null) return false;
+
+      if (_isAlive) {
+        anniversaries[index] = updated;
+        anniversaries.sort(
+          (a, b) => _service.calculateCountdown(a).compareTo(_service.calculateCountdown(b)),
+        );
         Get.snackbar('成功', '纪念日已更新');
-        return true;
       }
-      return false;
+      return true;
     } catch (e) {
-      if (isMounted) {
+      if (_isAlive) {
         Get.snackbar('提示', '更新失败，请稍后重试');
       }
       return false;
@@ -123,19 +141,18 @@ class AnniversaryController extends GetxController {
 
   /// 删除纪念日
   Future<bool> deleteAnniversary(String id) async {
-    if (_relationId == null) return false;
-    if (!isMounted) return false;
+    if (!_isAlive) return false;
 
     try {
-      final success = await _service.deleteAnniversary(id, _relationId!);
-      if (success && isMounted) {
-        anniversaries.removeWhere((a) => a.id == id);
+      final success = await _service.deleteAnniversary(objectId: id);
+      if (success && _isAlive) {
+        anniversaries.removeWhere((a) => a.objectId == id);
         Get.snackbar('成功', '纪念日已删除');
         return true;
       }
       return false;
     } catch (e) {
-      if (isMounted) {
+      if (_isAlive) {
         Get.snackbar('提示', '删除失败，请稍后重试');
       }
       return false;

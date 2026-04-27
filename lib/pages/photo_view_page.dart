@@ -28,7 +28,12 @@ class _PhotoViewPageState extends State<PhotoViewPage> {
   @override
   void initState() {
     super.initState();
-    _photoId = Get.arguments['photoId'] ?? '';
+    final args = Get.arguments;
+    if (args is Map<String, dynamic>) {
+      _photoId = (args['photoId'] ?? '').toString();
+    } else {
+      _photoId = '';
+    }
     _loadPhoto();
   }
 
@@ -249,6 +254,7 @@ class _PhotoViewPageState extends State<PhotoViewPage> {
             onPressed: () async {
               Get.back(); // 关闭对话框
               final success = await _controller.deletePhoto(_photoId);
+              if (!mounted) return;
               if (success) {
                 Get.back(); // 返回列表页
               }

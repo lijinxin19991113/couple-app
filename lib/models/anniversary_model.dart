@@ -103,6 +103,9 @@ class Anniversary extends Equatable {
     if (value is DateTime) {
       return value;
     }
+    if (value is int) {
+      return DateTime.fromMillisecondsSinceEpoch(value);
+    }
     if (value is String) {
       return DateTime.tryParse(value);
     }
@@ -171,4 +174,82 @@ class Anniversary extends Equatable {
         createdAt,
         updatedAt,
       ];
+}
+
+typedef AnniversaryModel = Anniversary;
+typedef RepeatType = AnniversaryRepeatType;
+
+extension AnniversaryTypeX on AnniversaryType {
+  String get displayName {
+    switch (this) {
+      case AnniversaryType.love:
+        return '恋爱';
+      case AnniversaryType.birthday:
+        return '生日';
+      case AnniversaryType.firstMet:
+        return '初见';
+      case AnniversaryType.custom:
+        return '自定义';
+    }
+  }
+
+  String get icon {
+    switch (this) {
+      case AnniversaryType.love:
+        return '💖';
+      case AnniversaryType.birthday:
+        return '🎂';
+      case AnniversaryType.firstMet:
+        return '🌟';
+      case AnniversaryType.custom:
+        return '📅';
+    }
+  }
+}
+
+extension AnniversaryRepeatTypeX on AnniversaryRepeatType {
+  String get displayName {
+    switch (this) {
+      case AnniversaryRepeatType.none:
+        return '不重复';
+      case AnniversaryRepeatType.yearly:
+        return '每年';
+      case AnniversaryRepeatType.monthly:
+        return '每月';
+      case AnniversaryRepeatType.weekly:
+        return '每周';
+    }
+  }
+}
+
+extension AnniversaryX on Anniversary {
+  String get id => objectId;
+
+  int get countdownDays {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final source = DateTime(date.year, date.month, date.day);
+    switch (repeatType) {
+      case AnniversaryRepeatType.none:
+        return source.difference(today).inDays;
+      case AnniversaryRepeatType.yearly:
+        var next = DateTime(today.year, source.month, source.day);
+        if (next.isBefore(today)) {
+          next = DateTime(today.year + 1, source.month, source.day);
+        }
+        return next.difference(today).inDays;
+      case AnniversaryRepeatType.monthly:
+        var next = DateTime(today.year, today.month, source.day);
+        if (next.isBefore(today)) {
+          next = DateTime(today.year, today.month + 1, source.day);
+        }
+        return next.difference(today).inDays;
+      case AnniversaryRepeatType.weekly:
+        var next = today;
+        while (next.weekday != source.weekday || next.isBefore(today)) {
+          next = next.add(const Duration(days: 1));
+        }
+        return next.difference(today).inDays;
+    }
+  }
 }

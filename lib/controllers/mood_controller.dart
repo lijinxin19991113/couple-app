@@ -2,7 +2,7 @@ import 'package:get/get.dart';
 
 import '../models/mood_record_model.dart';
 import '../services/mood_service.dart';
-import 'auth_controller.dart';
+import 'user_controller.dart';
 
 /// 心情控制器
 class MoodController extends GetxController {
@@ -23,28 +23,29 @@ class MoodController extends GetxController {
   /// 当前用户 ID
   String? _userId;
 
+  bool get _isAlive => !isClosed;
+
   @override
   void onInit() {
     super.onInit();
-    // 从 UserController 获取用户信息
     _loadUserInfo();
   }
 
   /// 加载用户信息
   Future<void> _loadUserInfo() async {
     try {
-      final userController = Get.find<AuthController>();
-      _userId = userController.currentUser.value?.id;
-      // TODO: 从 CoupleController 获取 relationId
-      _relationId = 'relation_001'; // 模拟
+      final userController = Get.find<UserController>();
+      _userId = userController.currentUser.value?.id ?? 'mock_user_001';
+      _relationId = userController.coupleRelation.value?.id ?? 'relation_001';
     } catch (e) {
-      // 忽略
+      _userId = 'mock_user_001';
+      _relationId = 'relation_001';
     }
   }
 
   /// 加载时间线
   Future<void> loadTimeline() async {
-    if (!mounted) return;
+    if (!_isAlive || _relationId == null) return;
 
     isLoading.value = true;
     try {
@@ -52,22 +53,20 @@ class MoodController extends GetxController {
       final startDate = now.subtract(const Duration(days: 30));
 
       final records = await _moodService.getMoodTimeline(
-        relationId: _relationId ?? '',
-        startDate: startDate,
-        endDate: now,
-        page: 1,
-        pageSize: 20,
+        relationId: _relationId!,
+        start: startDate,
+        end: now,
       );
 
-      if (mounted) {
+      if (_isAlive) {
         moodRecords.value = records;
       }
     } catch (e) {
-      if (mounted) {
+      if (_isAlive) {
         Get.snackbar('错误', '加载心情记录失败');
       }
     } finally {
-      if (mounted) {
+      if (_isAlive) {
         isLoading.value = false;
       }
     }
@@ -75,16 +74,17 @@ class MoodController extends GetxController {
 
   /// 检查今日打卡
   Future<void> checkTodayMood() async {
-    if (!mounted || _relationId == null) return;
+    if (!_isAlive || _relationId == null) return;
 
     try {
       final today = DateTime.now();
       final record = await _moodService.getMoodByDate(
         relationId: _relationId!,
         date: today,
+        userId: _userId,
       );
 
-      if (mounted) {
+      if (_isAlive) {
         todayMood.value = record;
       }
     } catch (e) {
@@ -97,10 +97,10 @@ class MoodController extends GetxController {
     required MoodType moodType,
     required int moodScore,
     String? content,
-    List<String> imageUrls = const [],
+    List<String> imageUrls = const <String>[],
     bool visibleToPartner = true,
   }) async {
-    if (!mounted || _relationId == null || _userId == null) return;
+    if (!_isAlive || _relationId == null || _userId == null) return;
 
     isLoading.value = true;
     try {
@@ -114,17 +114,18 @@ class MoodController extends GetxController {
         visibleToPartner: visibleToPartner,
       );
 
-      if (mounted) {
+      if (_isAlive) {
         todayMood.value = record;
+        moodRecords.removeWhere((item) => item.objectId == record.objectId);
         moodRecords.insert(0, record);
         Get.snackbar('成功', '心情打卡完成');
       }
     } catch (e) {
-      if (mounted) {
+      if (_isAlive) {
         Get.snackbar('错误', '打卡失败，请重试');
       }
     } finally {
-      if (mounted) {
+      if (_isAlive) {
         isLoading.value = false;
       }
     }
@@ -139,37 +140,38 @@ class MoodController extends GetxController {
     List<String>? imageUrls,
     bool? visibleToPartner,
   }) async {
-    if (!mounted) return;
+    if (!_isAlive) return;
+    final index = moodRecords.indexWhere((record) => record.objectId == id);
+    if (index < 0) return;
 
     isLoading.value = true;
     try {
-      final updated = await _moodService.updateMoodRecord(
-        id: id,
+      final current = moodRecords[index];
+      final updatedDraft = current.copyWith(
         moodType: moodType,
         moodScore: moodScore,
         content: content,
         imageUrls: imageUrls,
         visibleToPartner: visibleToPartner,
       );
+      final updated = await _moodService.updateMoodRecord(record: updatedDraft);
+      if (updated == null) {
+        throw Exception('update failed');
+      }
 
-      if (mounted) {
-        // 更新列表中的记录
-        final index = moodRecords.indexWhere((r) => r.objectId == id);
-        if (index != -1) {
-          moodRecords[index] = updated;
-        }
-        // 更新今日心情
+      if (_isAlive) {
+        moodRecords[index] = updated;
         if (todayMood.value?.objectId == id) {
           todayMood.value = updated;
         }
         Get.snackbar('成功', '更新成功');
       }
     } catch (e) {
-      if (mounted) {
+      if (_isAlive) {
         Get.snackbar('错误', '更新失败');
       }
     } finally {
-      if (mounted) {
+      if (_isAlive) {
         isLoading.value = false;
       }
     }
@@ -178,7 +180,6 @@ class MoodController extends GetxController {
   /// 加载趋势
   Future<Map<String, dynamic>?> loadTrend({int days = 7}) async {
     if (_relationId == null) return null;
-
     try {
       return await _moodService.getMoodTrend(
         relationId: _relationId!,
@@ -192,7 +193,6 @@ class MoodController extends GetxController {
   /// 加载统计
   Future<Map<String, dynamic>?> loadStatistics() async {
     if (_relationId == null) return null;
-
     try {
       return await _moodService.getMoodStatistics(
         relationId: _relationId!,
@@ -205,18 +205,11 @@ class MoodController extends GetxController {
   /// 按日期分组的心情记录
   Map<String, List<MoodRecord>> get groupedRecords {
     final grouped = <String, List<MoodRecord>>{};
-
     for (final record in moodRecords) {
       final key =
           '${record.recordDate.year}-${record.recordDate.month.toString().padLeft(2, '0')}-${record.recordDate.day.toString().padLeft(2, '0')}';
-
-      if (grouped.containsKey(key)) {
-        grouped[key]!.add(record);
-      } else {
-        grouped[key] = [record];
-      }
+      grouped.putIfAbsent(key, () => <MoodRecord>[]).add(record);
     }
-
     return grouped;
   }
 
@@ -228,10 +221,10 @@ class MoodController extends GetxController {
 
     if (recordDate == today) {
       return '今天';
-    } else if (recordDate == today.subtract(const Duration(days: 1))) {
-      return '昨天';
-    } else {
-      return '${date.month}月${date.day}日';
     }
+    if (recordDate == today.subtract(const Duration(days: 1))) {
+      return '昨天';
+    }
+    return '${date.month}月${date.day}日';
   }
 }

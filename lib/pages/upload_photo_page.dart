@@ -359,10 +359,7 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
             ),
           ),
           Obx(() => Switch(
-                value: _controller.uploadProgress.value > 0 &&
-                        _controller.uploadProgress.value < 1
-                    ? _visibility == AlbumVisibility.both
-                    : _visibility == AlbumVisibility.both,
+                value: _visibility == AlbumVisibility.both,
                 onChanged: _isUploading
                     ? null
                     : (value) {
@@ -422,6 +419,7 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
         imageQuality: 85,
       );
       if (image != null) {
+        if (!mounted) return;
         setState(() => _selectedImage = image);
       }
     } catch (e) {
@@ -438,6 +436,7 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
       lastDate: DateTime.now(),
     );
     if (date != null) {
+      if (!mounted) return;
       setState(() => _shotAt = date);
     }
   }
@@ -480,6 +479,10 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
 
       if (success) {
         Get.back();
+      }
+    } catch (e) {
+      if (mounted) {
+        Get.snackbar('错误', '上传失败，请稍后重试');
       }
     } finally {
       if (mounted) {

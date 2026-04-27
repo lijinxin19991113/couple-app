@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../config/colors.dart';
 import '../controllers/anniversary_controller.dart';
 import '../models/anniversary_model.dart';
+import '../services/anniversary_service.dart';
 import 'anniversary_form_page.dart';
 
 /// 纪念日列表页
@@ -15,13 +16,15 @@ class AnniversaryPage extends StatefulWidget {
 }
 
 class _AnniversaryPageState extends State<AnniversaryPage> {
-  final AnniversaryController _controller = Get.find<AnniversaryController>();
+  late final AnniversaryController _controller;
 
   @override
   void initState() {
     super.initState();
-    // 设置关系 ID（实际应从 UserController 获取）
-    // _controller.setRelationId('relation_id');
+    if (!Get.isRegistered<AnniversaryService>()) {
+      Get.put(AnniversaryService(), permanent: true);
+    }
+    _controller = Get.put(AnniversaryController());
   }
 
   @override

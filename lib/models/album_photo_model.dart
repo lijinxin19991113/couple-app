@@ -63,6 +63,9 @@ class AlbumPhoto extends Equatable {
     if (value is DateTime) {
       return value;
     }
+    if (value is int) {
+      return DateTime.fromMillisecondsSinceEpoch(value);
+    }
     if (value is String) {
       return DateTime.tryParse(value);
     }

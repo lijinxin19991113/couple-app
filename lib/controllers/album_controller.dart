@@ -38,9 +38,12 @@ class AlbumController extends GetxController {
   String get _relationId =>
       _userController.coupleRelation.value?.id ?? '';
 
+
+  bool get _isAlive => !isClosed;
+
   /// 加载照片列表
   Future<void> loadPhotos({String? yearMonth}) async {
-    if (!mounted) return;
+    if (!_isAlive) return;
     isLoading.value = true;
 
     try {
@@ -48,13 +51,13 @@ class AlbumController extends GetxController {
         relationId: _relationId,
       );
 
-      if (!mounted) return;
+      if (!_isAlive) return;
       photos.value = result;
     } catch (e) {
-      if (!mounted) return;
+      if (!_isAlive) return;
       Get.snackbar('错误', '加载照片失败: $e');
     } finally {
-      if (!mounted) return;
+      if (!_isAlive) return;
       isLoading.value = false;
     }
   }
@@ -73,13 +76,13 @@ class AlbumController extends GetxController {
     List<String> tags = const [],
     AlbumVisibility visibility = AlbumVisibility.both,
   }) async {
-    if (!mounted) return false;
+    if (!_isAlive) return false;
     uploadProgress.value = 0.0;
 
     try {
       // 模拟上传进度
       for (int i = 1; i <= 10; i++) {
-        if (!mounted) return false;
+        if (!_isAlive) return false;
         await Future.delayed(const Duration(milliseconds: 200));
         uploadProgress.value = i / 10;
       }
@@ -95,13 +98,13 @@ class AlbumController extends GetxController {
         visibility: visibility,
       );
 
-      if (!mounted) return false;
+      if (!_isAlive) return false;
       photos.insert(0, photo);
       uploadProgress.value = 0.0;
       Get.snackbar('成功', '照片上传成功');
       return true;
     } catch (e) {
-      if (!mounted) return false;
+      if (!_isAlive) return false;
       uploadProgress.value = 0.0;
       Get.snackbar('错误', '上传失败: $e');
       return false;
@@ -112,7 +115,7 @@ class AlbumController extends GetxController {
   Future<bool> deletePhoto(String photoId) async {
     try {
       final success = await _albumService.deletePhoto(photoId: photoId);
-      if (!mounted) return false;
+      if (!_isAlive) return false;
 
       if (success) {
         photos.removeWhere((p) => p.objectId == photoId);
@@ -123,7 +126,7 @@ class AlbumController extends GetxController {
         return false;
       }
     } catch (e) {
-      if (!mounted) return false;
+      if (!_isAlive) return false;
       Get.snackbar('错误', '删除失败: $e');
       return false;
     }
@@ -136,7 +139,7 @@ class AlbumController extends GetxController {
         photoId: photoId,
         caption: caption,
       );
-      if (!mounted) return false;
+      if (!_isAlive) return false;
 
       if (updated != null) {
         final index = photos.indexWhere((p) => p.objectId == photoId);
@@ -150,7 +153,7 @@ class AlbumController extends GetxController {
         return false;
       }
     } catch (e) {
-      if (!mounted) return false;
+      if (!_isAlive) return false;
       Get.snackbar('错误', '更新失败: $e');
       return false;
     }
@@ -161,7 +164,7 @@ class AlbumController extends GetxController {
     try {
       return await _albumService.getPhotoDetail(photoId: photoId);
     } catch (e) {
-      if (!mounted) return null;
+      if (!_isAlive) return null;
       Get.snackbar('错误', '获取照片详情失败: $e');
       return null;
     }
