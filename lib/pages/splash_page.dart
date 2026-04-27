@@ -50,7 +50,14 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
     if (!mounted) return;
 
     if (authController.isLoggedIn.value) {
-      Get.offAllNamed(AppRoutes.home);
+      final userController = Get.find<UserController>();
+      await userController.loadCoupleRelation();
+      if (!mounted) return;
+      if (userController.isCoupled.value) {
+        Get.offAllNamed(AppRoutes.home);
+      } else {
+        Get.offAllNamed(AppRoutes.coupleBind);
+      }
     } else {
       Get.offAllNamed(AppRoutes.login);
     }

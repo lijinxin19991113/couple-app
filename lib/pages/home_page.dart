@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../config/colors.dart';
+import '../config/routes.dart';
 import '../controllers/user_controller.dart';
 import '../controllers/auth_controller.dart';
 
@@ -127,67 +128,105 @@ class _HomeTab extends StatelessWidget {
               }),
               const SizedBox(height: 20),
 
-              // 在一起天数
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: AppColors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primary.withOpacity(0.1),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 60,
-                      height: 60,
-                      decoration: const BoxDecoration(
-                        color: AppColors.primaryLight,
-                        shape: BoxShape.circle,
+              Obx(() {
+                final isCoupled = userController.isCoupled.value;
+                if (!isCoupled) {
+                  // 未绑定情侣，显示引导卡片
+                  return Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFFFB6C1), Color(0xFFFF69B4)],
                       ),
-                      child: const Icon(Icons.favorite, color: AppColors.primary),
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            '在一起',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: AppColors.gray3,
-                            ),
+                    child: Column(
+                      children: [
+                        const Icon(Icons.favorite, color: Colors.white, size: 40),
+                        const SizedBox(height: 12),
+                        const Text(
+                          '绑定你的另一半',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
                           ),
-                          const SizedBox(height: 4),
-                          Obx(() {
-                            final days = userController.daysTogether;
-                            return Text(
-                              '第 $days 天',
-                              style: const TextStyle(
-                                fontSize: 28,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primary,
+                        ),
+                        const SizedBox(height: 4),
+                        const Text(
+                          '一起记录美好时光',
+                          style: TextStyle(color: Colors.white70, fontSize: 14),
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: () => Get.toNamed(AppRoutes.coupleBind),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: AppColors.pink,
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                          ),
+                          child: const Text('立即绑定'),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+                // 已绑定：在一起天数卡片
+                return GestureDetector(
+                  onTap: () => Get.toNamed(AppRoutes.coupleProfile),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: AppColors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primary.withOpacity(0.1),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 60,
+                          height: 60,
+                          decoration: const BoxDecoration(
+                            color: AppColors.primaryLight,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.favorite, color: AppColors.primary),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                '在一起',
+                                style: TextStyle(fontSize: 14, color: AppColors.gray3),
                               ),
-                            );
-                          }),
-                        ],
-                      ),
+                              const SizedBox(height: 4),
+                              Text(
+                                '第 ${userController.daysTogether} 天',
+                                style: const TextStyle(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Icon(Icons.arrow_forward_ios, color: AppColors.gray3, size: 16),
+                      ],
                     ),
-                    const Icon(
-                      Icons.arrow_forward_ios,
-                      color: AppColors.gray3,
-                      size: 16,
-                    ),
-                  ],
-                ),
-              ),
+                  ),
+                );
+              }),
               const SizedBox(height: 20),
 
               // 快捷入口
@@ -443,12 +482,12 @@ class _ProfileTab extends StatelessWidget {
           _SettingsItem(
             icon: Icons.person_outline,
             title: '个人资料',
-            onTap: () {},
+            onTap: () => Get.toNamed(AppRoutes.profileEdit),
           ),
           _SettingsItem(
             icon: Icons.favorite_outline,
             title: '情侣档案',
-            onTap: () {},
+            onTap: () => Get.toNamed(AppRoutes.coupleProfile),
           ),
           _SettingsItem(
             icon: Icons.notifications_outlined,
