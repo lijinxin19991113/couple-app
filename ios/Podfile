@@ -1,0 +1,31 @@
+# Uncomment this line to define a global platform for this project.
+platform :ios, '12.0'
+
+# CocoaPods analytics gives network insight into which pods are being used
+install_all_cocoapods!install_all_cocoapods
+
+# ReactiveObjC pod spec to support socket_io_client
+pod 'ReactiveObjC', :modular_headers => true
+
+# use_frameworks! :linkage => :static is recommended for Flutter plugins
+# If you need to use static linkage for compatibility reasons
+# use_frameworks! :linkage => :static
+
+environment = {
+  'STRIP_CLANG_WARNING_MODE' => 'none'
+}
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    flutter_additional_ios_build_settings(target)
+
+    # 设置最低 iOS 版本
+    target.build_configurations.each do |config|
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.0'
+
+      # 解决警告问题
+      config.build_settings['GCC_WARN_INHIBIT_ALL_WARNINGS'] = 'YES'
+      config.build_settings['SWIFT_SUPPRESS_WARNINGS'] = 'YES'
+    end
+  end
+end
