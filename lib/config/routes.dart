@@ -17,6 +17,9 @@ import '../pages/anniversary_page.dart';
 import '../pages/anniversary_form_page.dart';
 import '../pages/mood_page.dart';
 import '../pages/mood_checkin_page.dart';
+import '../pages/diary_page.dart';
+import '../pages/diary_write_page.dart';
+import '../pages/diary_detail_page.dart';
 
 /// 路由配置
 class AppRoutes {
@@ -39,6 +42,9 @@ class AppRoutes {
   static const String anniversaryForm = '/anniversary-form';
   static const String mood = '/mood';
   static const String moodCheckin = '/mood-checkin';
+  static const String diary = '/diary';
+  static const String diaryWrite = '/diary-write';
+  static const String diaryDetail = '/diary-detail';
 
   // ===== 路由页面列表 =====
   static final List<GetPage> pages = [
@@ -120,6 +126,21 @@ class AppRoutes {
     GetPage(
       name: moodCheckin,
       page: () => const MoodCheckinPage(),
+      transition: Transition.rightToLeft,
+    ),
+    GetPage(
+      name: diary,
+      page: () => const DiaryPage(),
+      transition: Transition.rightToLeft,
+    ),
+    GetPage(
+      name: diaryWrite,
+      page: () => const DiaryWritePage(),
+      transition: Transition.rightToLeft,
+    ),
+    GetPage(
+      name: diaryDetail,
+      page: () => const DiaryDetailPage(),
       transition: Transition.rightToLeft,
     ),
   ];
