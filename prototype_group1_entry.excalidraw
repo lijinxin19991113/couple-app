@@ -1,0 +1,96 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "hermes-agent",
+  "elements": [
+    {"type":"text","id":"g1_title","x":280,"y":10,"text":"Couple App - 1.引导页/登录/主页","fontSize":24,"fontFamily":1,"strokeColor":"#1e1e1e","originalText":"Couple App - 1.引导页/登录/主页","autoResize":true},
+
+    {"type":"text","id":"g1_sub","x":240,"y":45,"text":"Page 1: Onboarding / 引导页","fontSize":16,"fontFamily":1,"strokeColor":"#757575","originalText":"Page 1: Onboarding / 引导页","autoResize":true},
+
+    {"type":"rectangle","id":"p1_frame","x":50,"y":80,"width":220,"height":420,"roundness":{"type":3},"backgroundColor":"#f5f5f5","fillStyle":"solid","strokeColor":"#1e1e1e","strokeWidth":2,"boundElements":[]},
+    {"type":"text","id":"p1_status","x":50,"y":80,"width":220,"height":20,"text":"","fontSize":12,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"center","verticalAlign":"middle","containerId":"p1_frame","originalText":"","autoResize":true},
+
+    {"type":"rectangle","id":"p1_top","x":50,"y":80,"width":220,"height":40,"backgroundColor":"#eebefa","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#ec4899","strokeWidth":1,"boundElements":[]},
+    {"type":"text","id":"p1_notch","x":130,"y":87,"width":60,"height":14,"text":"Couple","fontSize":14,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"center","verticalAlign":"middle","containerId":"p1_top","originalText":"Couple","autoResize":true},
+
+    {"type":"ellipse","id":"p1_heart","x":115,"y":200,"width":90,"height":90,"backgroundColor":"#ffc9c9","fillStyle":"solid","strokeColor":"#ef4444","strokeWidth":2,"boundElements":[]},
+    {"type":"text","id":"p1_heart_t","x":130,"y":233,"width":60,"height":24,"text":"HEART","fontSize":18,"fontFamily":1,"strokeColor":"#ef4444","textAlign":"center","verticalAlign":"middle","containerId":"p1_heart","originalText":"HEART","autoResize":true},
+
+    {"type":"text","id":"p1_title","x":75,"y":310,"width":170,"height":28,"text":"情侣日常","fontSize":22,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"center","verticalAlign":"middle","autoResize":true},
+    {"type":"text","id":"p1_sub","x":85,"y":342,"width":150,"height":20,"text":"记录美好每一刻","fontSize":16,"fontFamily":1,"strokeColor":"#757575","textAlign":"center","verticalAlign":"middle","autoResize":true},
+
+    {"type":"rectangle","id":"p1_btn","x":100,"y":400,"width":120,"height":40,"backgroundColor":"#ec4899","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#ec4899","boundElements":[{"id":"p1_btn_t","type":"text"}]},
+    {"type":"text","id":"p1_btn_t","x":105,"y":408,"width":110,"height":24,"text":"开始使用","fontSize":16,"fontFamily":1,"strokeColor":"#ffffff","textAlign":"center","verticalAlign":"middle","containerId":"p1_btn","originalText":"开始使用","autoResize":true},
+
+    {"type":"rectangle","id":"p1_dots","x":115,"y":460,"width":90,"height":12,"backgroundColor":"transparent","fillStyle":"solid","strokeColor":"transparent","boundElements":[{"id":"p1_dot1","type":"ellipse"},{"id":"p1_dot2","type":"ellipse"},{"id":"p1_dot3","type":"ellipse"}]},
+    {"type":"ellipse","id":"p1_dot1","x":115,"y":462,"width":12,"height":12,"backgroundColor":"#ec4899","fillStyle":"solid","strokeColor":"#ec4899","boundElements":[]},
+    {"type":"ellipse","id":"p1_dot2","x":135,"y":462,"width":12,"height":12,"backgroundColor":"#eebefa","fillStyle":"solid","strokeColor":"#eebefa","boundElements":[]},
+    {"type":"ellipse","id":"p1_dot3","x":155,"y":462,"width":12,"height":12,"backgroundColor":"#eebefa","fillStyle":"solid","strokeColor":"#eebefa","boundElements":[]},
+
+    {"type":"text","id":"g1_p2_label","x":360,"y":45,"text":"Page 2: Login/Register / 登录注册","fontSize":16,"fontFamily":1,"strokeColor":"#757575","originalText":"Page 2: Login/Register / 登录注册","autoResize":true},
+
+    {"type":"rectangle","id":"p2_frame","x":310,"y":80,"width":220,"height":420,"roundness":{"type":3},"backgroundColor":"#f5f5f5","fillStyle":"solid","strokeColor":"#1e1e1e","strokeWidth":2,"boundElements":[]},
+    {"type":"rectangle","id":"p2_top","x":310,"y":80,"width":220,"height":40,"backgroundColor":"#eebefa","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#ec4899","strokeWidth":1,"boundElements":[]},
+    {"type":"text","id":"p2_notch","x":390,"y":87,"width":60,"height":14,"text":"登录","fontSize":14,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"center","verticalAlign":"middle","containerId":"p2_top","originalText":"登录","autoResize":true},
+
+    {"type":"ellipse","id":"p2_avatar","x":380,"y":145,"width":70,"height":70,"backgroundColor":"#eebefa","fillStyle":"solid","strokeColor":"#ec4899","strokeWidth":2,"boundElements":[]},
+    {"type":"text","id":"p2_avatar_t","x":392,"y":168,"width":46,"height":24,"text":"头像","fontSize":16,"fontFamily":1,"strokeColor":"#ec4899","textAlign":"center","verticalAlign":"middle","containerId":"p2_avatar","originalText":"头像","autoResize":true},
+
+    {"type":"text","id":"p2_welcome","x":330,"y":235,"width":180,"height":24,"text":"欢迎回来","fontSize":20,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"center","verticalAlign":"middle","autoResize":true},
+
+    {"type":"rectangle","id":"p2_phone","x":330,"y":270,"width":180,"height":40,"backgroundColor":"#ffffff","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#d0bfff","boundElements":[{"id":"p2_phone_t","type":"text"},{"id":"p2_phone_icon","type":"text"}]},
+    {"type":"text","id":"p2_phone_icon","x":338,"y":278,"width":20,"height":24,"text":"+86","fontSize":14,"fontFamily":1,"strokeColor":"#757575","textAlign":"center","verticalAlign":"middle","autoResize":true},
+    {"type":"text","id":"p2_phone_t","x":360,"y":278,"width":140,"height":24,"text":"手机号","fontSize":14,"fontFamily":1,"strokeColor":"#b0b0b0","textAlign":"left","verticalAlign":"middle","containerId":"p2_phone","originalText":"手机号","autoResize":true},
+
+    {"type":"rectangle","id":"p2_pwd","x":330,"y":320,"width":180,"height":40,"backgroundColor":"#ffffff","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#d0bfff","boundElements":[{"id":"p2_pwd_t","type":"text"}]},
+    {"type":"text","id":"p2_pwd_t","x":338,"y":328,"width":164,"height":24,"text":"验证码","fontSize":14,"fontFamily":1,"strokeColor":"#b0b0b0","textAlign":"left","verticalAlign":"middle","containerId":"p2_pwd","originalText":"验证码","autoResize":true},
+
+    {"type":"rectangle","id":"p2_code","x":330,"y":370,"width":110,"height":40,"backgroundColor":"#ffffff","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#d0bfff","boundElements":[{"id":"p2_code_t","type":"text"}]},
+    {"type":"text","id":"p2_code_t","x":340,"y":378,"width":90,"height":24,"text":"请输入验证码","fontSize":14,"fontFamily":1,"strokeColor":"#b0b0b0","textAlign":"left","verticalAlign":"middle","containerId":"p2_code","originalText":"请输入验证码","autoResize":true},
+    {"type":"rectangle","id":"p2_send","x":450,"y":370,"width":60,"height":40,"backgroundColor":"#ec4899","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#ec4899","boundElements":[{"id":"p2_send_t","type":"text"}]},
+    {"type":"text","id":"p2_send_t","x":455,"y":378,"width":50,"height":24,"text":"发送","fontSize":14,"fontFamily":1,"strokeColor":"#ffffff","textAlign":"center","verticalAlign":"middle","containerId":"p2_send","originalText":"发送","autoResize":true},
+
+    {"type":"rectangle","id":"p2_login_btn","x":330,"y":420,"width":180,"height":44,"backgroundColor":"#ec4899","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#ec4899","boundElements":[{"id":"p2_login_t","type":"text"}]},
+    {"type":"text","id":"p2_login_t","x":335,"y":430,"width":170,"height":24,"text":"登录","fontSize":16,"fontFamily":1,"strokeColor":"#ffffff","textAlign":"center","verticalAlign":"middle","containerId":"p2_login_btn","originalText":"登录","autoResize":true},
+
+    {"type":"text","id":"p2_tos","x":330,"y":475,"width":180,"height":16,"text":"登录即表示同意《用户协议》","fontSize":12,"fontFamily":1,"strokeColor":"#b0b0b0","textAlign":"center","verticalAlign":"middle","autoResize":true},
+
+    {"type":"text","id":"g1_p3_label","x":630,"y":45,"text":"Page 3: Home / 主页","fontSize":16,"fontFamily":1,"strokeColor":"#757575","originalText":"Page 3: Home / 主页","autoResize":true},
+
+    {"type":"rectangle","id":"p3_frame","x":580,"y":80,"width":220,"height":420,"roundness":{"type":3},"backgroundColor":"#f5f5f5","fillStyle":"solid","strokeColor":"#1e1e1e","strokeWidth":2,"boundElements":[]},
+    {"type":"rectangle","id":"p3_top","x":580,"y":80,"width":220,"height":50,"backgroundColor":"#eebefa","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#ec4899","strokeWidth":1,"boundElements":[]},
+    {"type":"text","id":"p3_title","x":590,"y":93,"width":100,"height":24,"text":"主页","fontSize":18,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"left","verticalAlign":"middle","autoResize":true},
+    {"type":"text","id":"p3_settings_icon","x":760,"y":93,"width":30,"height":24,"text":"[=]","fontSize":16,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"center","verticalAlign":"middle","autoResize":true},
+
+    {"type":"ellipse","id":"p3_avatar1","x":595,"y":150,"width":50,"height":50,"backgroundColor":"#ffc9c9","fillStyle":"solid","strokeColor":"#ef4444","strokeWidth":2,"boundElements":[]},
+    {"type":"text","id":"p3_a1_t","x":603,"y":170,"width":34,"height":14,"text":"我","fontSize":12,"fontFamily":1,"strokeColor":"#ef4444","textAlign":"center","verticalAlign":"middle","containerId":"p3_avatar1","originalText":"我","autoResize":true},
+
+    {"type":"text","id":"p3_hi","x":655,"y":155,"width":130,"height":22,"text":"早上好，李锦鑫","fontSize":16,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"left","verticalAlign":"middle","autoResize":true},
+    {"type":"text","id":"p3_days","x":655,"y":178,"width":130,"height":18,"text":"在一起第 188 天","fontSize":14,"fontFamily":1,"strokeColor":"#ec4899","textAlign":"left","verticalAlign":"middle","autoResize":true},
+
+    {"type":"ellipse","id":"p3_avatar2","x":680,"y":150,"width":50,"height":50,"backgroundColor":"#a5d8ff","fillStyle":"solid","strokeColor":"#4a9eed","strokeWidth":2,"boundElements":[]},
+    {"type":"text","id":"p3_a2_t","x":688,"y":170,"width":34,"height":14,"text":"Ta","fontSize":12,"fontFamily":1,"strokeColor":"#4a9eed","textAlign":"center","verticalAlign":"middle","containerId":"p3_avatar2","originalText":"Ta","autoResize":true},
+
+    {"type":"rectangle","id":"p3_card1","x":595,"y":220,"width":190,"height":80,"backgroundColor":"#ffffff","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#d0bfff","boundElements":[]},
+    {"type":"text","id":"p3_c1_title","x":605,"y":230,"width":80,"height":18,"text":"今日心情","fontSize":14,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"left","verticalAlign":"middle","autoResize":true},
+    {"type":"text","id":"p3_c1_emoji","x":605,"y":252,"width":40,"height":30,"text":"Happy","fontSize":20,"fontFamily":1,"strokeColor":"#22c55e","textAlign":"left","verticalAlign":"middle","autoResize":true},
+    {"type":"text","id":"p3_c1_status","x":645,"y":258,"width":130,"height":18,"text":"心情很好~","fontSize":13,"fontFamily":1,"strokeColor":"#757575","textAlign":"left","verticalAlign":"middle","autoResize":true},
+    {"type":"rectangle","id":"p3_c1_edit","x":735,"y":248,"width":40,"height":30,"backgroundColor":"#f5f5f5","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#d0bfff","boundElements":[]},
+    {"type":"text","id":"p3_c1_edit_t","x":740,"y":256,"width":30,"height":14,"text":"打卡","fontSize":12,"fontFamily":1,"strokeColor":"#8b5cf6","textAlign":"center","verticalAlign":"middle","autoResize":true},
+
+    {"type":"rectangle","id":"p3_card2","x":595,"y":310,"width":190,"height":70,"backgroundColor":"#ffffff","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#ffd8a8","boundElements":[]},
+    {"type":"text","id":"p3_c2_title","x":605,"y":320,"width":100,"height":18,"text":"下一个纪念日","fontSize":14,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"left","verticalAlign":"middle","autoResize":true},
+    {"type":"text","id":"p3_c2_name","x":605,"y":342,"width":100,"height":16,"text":"在一起纪念日","fontSize":13,"fontFamily":1,"strokeColor":"#f59e0b","textAlign":"left","verticalAlign":"middle","autoResize":true},
+    {"type":"text","id":"p3_c2_days","x":730,"y":330,"width":45,"height":30,"text":"5天","fontSize":20,"fontFamily":1,"strokeColor":"#f59e0b","textAlign":"center","verticalAlign":"middle","autoResize":true},
+
+    {"type":"rectangle","id":"p3_quick","x":595,"y":395,"width":90,"height":90,"backgroundColor":"#eebefa","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#ec4899","boundElements":[]},
+    {"type":"text","id":"p3_q1","x":605,"y":420,"width":70,"height":40,"text":"相册\n照片","fontSize":14,"fontFamily":1,"strokeColor":"#8b5cf6","textAlign":"center","verticalAlign":"middle","autoResize":true},
+
+    {"type":"rectangle","id":"p3_quick2","x":695,"y":395,"width":90,"height":90,"backgroundColor":"#a5d8ff","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#4a9eed","boundElements":[]},
+    {"type":"text","id":"p3_q2","x":705,"y":420,"width":70,"height":40,"text":"位置\n共享","fontSize":14,"fontFamily":1,"strokeColor":"#4a9eed","textAlign":"center","verticalAlign":"middle","autoResize":true},
+
+    {"type":"rectangle","id":"p3_nav","x":580,"y":475,"width":220,"height":25,"backgroundColor":"#ffffff","fillStyle":"solid","strokeColor":"#e0e0e0","boundElements":[]},
+    {"type":"text","id":"p3_nav_t","x":590,"y":480,"width":200,"height":16,"text":"首页  聊天  相册  日记  我的","fontSize":12,"fontFamily":1,"strokeColor":"#757575","textAlign":"center","verticalAlign":"middle","autoResize":true}
+  ],
+  "appState": {"viewBackgroundColor": "#ffffff"}
+}

@@ -1,0 +1,99 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "hermes-agent",
+  "elements": [
+    {"type":"text","id":"g2_title","x":240,"y":10,"text":"Couple App - 2.聊天/纪念日/相册/心情/位置","fontSize":22,"fontFamily":1,"strokeColor":"#1e1e1e","originalText":"Couple App - 2.聊天/纪念日/相册/心情/位置","autoResize":true},
+
+    {"type":"text","id":"g2_p4_label","x":50,"y":45,"text":"Page 4: Chat / 聊天","fontSize":15,"fontFamily":1,"strokeColor":"#757575","originalText":"Page 4: Chat / 聊天","autoResize":true},
+
+    {"type":"rectangle","id":"p4_frame","x":50,"y":75,"width":220,"height":420,"roundness":{"type":3},"backgroundColor":"#f5f5f5","fillStyle":"solid","strokeColor":"#1e1e1e","strokeWidth":2,"boundElements":[]},
+    {"type":"rectangle","id":"p4_top","x":50,"y":75,"width":220,"height":45,"backgroundColor":"#eebefa","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#ec4899","strokeWidth":1,"boundElements":[]},
+    {"type":"text","id":"p4_back","x":58,"y":86,"width":20,"height":22,"text":"<","fontSize":16,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"center","verticalAlign":"middle","autoResize":true},
+    {"type":"ellipse","id":"p4_av","x":82,"y":80,"width":34,"height":34,"backgroundColor":"#a5d8ff","fillStyle":"solid","strokeColor":"#4a9eed","strokeWidth":2,"boundElements":[]},
+    {"type":"text","id":"p4_av_t","x":88,"y":91,"width":22,"height":14,"text":"Ta","fontSize":12,"fontFamily":1,"strokeColor":"#4a9eed","textAlign":"center","verticalAlign":"middle","containerId":"p4_av","originalText":"Ta","autoResize":true},
+    {"type":"text","id":"p4_name","x":125,"y":84,"width":80,"height":18,"text":"亲爱的Ta","fontSize":15,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"left","verticalAlign":"middle","autoResize":true},
+    {"type":"text","id":"p4_menu","x":238,"y":86,"width":20,"height":22,"text":"...</","fontSize":16,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"center","verticalAlign":"middle","autoResize":true},
+
+    {"type":"rectangle","id":"p4_msg_area","x":50,"y":120,"width":220,"height":310,"backgroundColor":"#faf8ff","fillStyle":"solid","strokeColor":"transparent","boundElements":[]},
+
+    {"type":"rectangle","id":"p4_msg1","x":60,"y":135,"width":120,"height":40,"backgroundColor":"#ffffff","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#e0e0e0","boundElements":[]},
+    {"type":"text","id":"p4_msg1_t","x":70,"y":148,"width":100,"height":14,"text":"今天吃什么？","fontSize":13,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"left","verticalAlign":"middle","autoResize":true},
+    {"type":"text","id":"p4_msg1_time","x":70,"y":162,"width":60,"height":10,"text":"10:30","fontSize":10,"fontFamily":1,"strokeColor":"#b0b0b0","textAlign":"left","verticalAlign":"middle","autoResize":true},
+
+    {"type":"rectangle","id":"p4_msg2","x":140,"y":185,"width":115,"height":40,"backgroundColor":"#eebefa","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#ec4899","boundElements":[]},
+    {"type":"text","id":"p4_msg2_t","x":150,"y":198,"width":95,"height":14,"text":"火锅怎么样！","fontSize":13,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"left","verticalAlign":"middle","autoResize":true},
+    {"type":"text","id":"p4_msg2_time","x":220,"y":212,"width":30,"height":10,"text":"10:32","fontSize":10,"fontFamily":1,"strokeColor":"#b0b0b0","textAlign":"right","verticalAlign":"middle","autoResize":true},
+
+    {"type":"rectangle","id":"p4_msg3","x":60,"y":235,"width":140,"height":50,"backgroundColor":"#ffffff","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#e0e0e0","boundElements":[]},
+    {"type":"text","id":"p4_msg3_t","x":70,"y":248,"width":120,"height":14,"text":"那家重庆火锅？","fontSize":13,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"left","verticalAlign":"middle","autoResize":true},
+    {"type":"text","id":"p4_msg3_time","x":70,"y":265,"width":60,"height":10,"text":"10:33","fontSize":10,"fontFamily":1,"strokeColor":"#b0b0b0","textAlign":"left","verticalAlign":"middle","autoResize":true},
+
+    {"type":"rectangle","id":"p4_img","x":140,"y":295,"width":80,"height":80,"backgroundColor":"#ffd8a8","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#f59e0b","boundElements":[]},
+    {"type":"text","id":"p4_img_t","x":155,"y":327,"width":50,"height":16,"text":"图片","fontSize":13,"fontFamily":1,"strokeColor":"#f59e0b","textAlign":"center","verticalAlign":"middle","autoResize":true},
+
+    {"type":"rectangle","id":"p4_bottom","x":50,"y":430,"width":220,"height":65,"backgroundColor":"#ffffff","fillStyle":"solid","strokeColor":"#e0e0e0","boundElements":[]},
+    {"type":"text","id":"p4_plus","x":58,"y":442,"width":22,"height":22,"text":"+","fontSize":18,"fontFamily":1,"strokeColor":"#757575","textAlign":"center","verticalAlign":"middle","autoResize":true},
+    {"type":"rectangle","id":"p4_input","x":85,"y":438,"width":150,"height":36,"backgroundColor":"#f5f5f5","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#d0bfff","boundElements":[]},
+    {"type":"text","id":"p4_input_t","x":95,"y":448,"width":130,"height":16,"text":"说点什么...","fontSize":13,"fontFamily":1,"strokeColor":"#b0b0b0","textAlign":"left","verticalAlign":"middle","autoResize":true},
+    {"type":"text","id":"p4_send","x":240,"y":442,"width":22,"height":22,"text":"^_^","fontSize":16,"fontFamily":1,"strokeColor":"#ec4899","textAlign":"center","verticalAlign":"middle","autoResize":true},
+
+    {"type":"text","id":"g2_p5_label","x":330,"y":45,"text":"Page 5: Calendar / 纪念日","fontSize":15,"fontFamily":1,"strokeColor":"#757575","originalText":"Page 5: Calendar / 纪念日","autoResize":true},
+
+    {"type":"rectangle","id":"p5_frame","x":310,"y":75,"width":220,"height":420,"roundness":{"type":3},"backgroundColor":"#f5f5f5","fillStyle":"solid","strokeColor":"#1e1e1e","strokeWidth":2,"boundElements":[]},
+    {"type":"rectangle","id":"p5_top","x":310,"y":75,"width":220,"height":45,"backgroundColor":"#ffd8a8","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#f59e0b","strokeWidth":1,"boundElements":[]},
+    {"type":"text","id":"p5_back","x":318,"y":86,"width":20,"height":22,"text":"<","fontSize":16,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"center","verticalAlign":"middle","autoResize":true},
+    {"type":"text","id":"p5_title","x":350,"y":86,"width":80,"height":22,"text":"纪念日","fontSize":16,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"center","verticalAlign":"middle","autoResize":true},
+    {"type":"text","id":"p5_add","x":490,"y":86,"width":22,"height":22,"text":"+","fontSize":18,"fontFamily":1,"strokeColor":"#f59e0b","textAlign":"center","verticalAlign":"middle","autoResize":true},
+
+    {"type":"rectangle","id":"p5_counter","x":320,"y":130,"width":200,"height":90,"backgroundColor":"#ffffff","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#ffd8a8","boundElements":[]},
+    {"type":"text","id":"p5_c_label","x":330,"y":140,"width":100,"height":16,"text":"在一起纪念日","fontSize":14,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"left","verticalAlign":"middle","autoResize":true},
+    {"type":"text","id":"p5_c_date","x":330,"y":160,"width":100,"height":14,"text":"2025-10-12","fontSize":12,"fontFamily":1,"strokeColor":"#757575","textAlign":"left","verticalAlign":"middle","autoResize":true},
+    {"type":"text","id":"p5_c_big","x":370,"y":135,"width":140,"height":60,"text":"188天","fontSize":36,"fontFamily":1,"strokeColor":"#f59e0b","textAlign":"right","verticalAlign":"middle","autoResize":true},
+    {"type":"text","id":"p5_c_label2","x":470,"y":200,"width":45,"height":14,"text":"倒计时","fontSize":12,"fontFamily":1,"strokeColor":"#f59e0b","textAlign":"right","verticalAlign":"middle","autoResize":true},
+
+    {"type":"rectangle","id":"p5_cal","x":320,"y":235,"width":200,"height":150,"backgroundColor":"#ffffff","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#e0e0e0","boundElements":[]},
+    {"type":"text","id":"p5_cal_title","x":330,"y":245,"width":180,"height":18,"text":"2026年4月","fontSize":14,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"center","verticalAlign":"middle","autoResize":true},
+    {"type":"text","id":"p5_cal_days","x":340,"y":268,"width":160,"height":100,"text":"一  二  三  四  五  六  日\n\n1   2   3   4   5\n6   7   8   9   10  11  12\n13  14  15  16  17  18  19\n20  21  22  23  24  25  26\n27  28  29  30","fontSize":11,"fontFamily":1,"strokeColor":"#757575","textAlign":"left","verticalAlign":"top","autoResize":true},
+    {"type":"ellipse","id":"p5_cal_hl","x":392,"y":330,"width":18,"height":18,"backgroundColor":"#ffc9c9","fillStyle":"solid","strokeColor":"#ef4444","boundElements":[]},
+
+    {"type":"rectangle","id":"p5_item1","x":320,"y":395,"width":200,"height":40,"backgroundColor":"#fff3bf","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#f59e0b","boundElements":[]},
+    {"type":"text","id":"p5_i1","x":330,"y":403,"width":100,"height":14,"text":"相识纪念日  180天","fontSize":13,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"left","verticalAlign":"middle","autoResize":true},
+    {"type":"text","id":"p5_i1_date","x":450,"y":403,"width":60,"height":14,"text":"2025.04.27","fontSize":12,"fontFamily":1,"strokeColor":"#757575","textAlign":"right","verticalAlign":"middle","autoResize":true},
+
+    {"type":"rectangle","id":"p5_item2","x":320,"y":445,"width":200,"height":40,"backgroundColor":"#ffc9c9","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#ef4444","boundElements":[]},
+    {"type":"text","id":"p5_i2","x":330,"y":453,"width":100,"height":14,"text":"情人节  12天后","fontSize":13,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"left","verticalAlign":"middle","autoResize":true},
+    {"type":"text","id":"p5_i2_date","x":450,"y":453,"width":60,"height":14,"text":"2026.05.20","fontSize":12,"fontFamily":1,"strokeColor":"#757575","textAlign":"right","verticalAlign":"middle","autoResize":true},
+
+    {"type":"text","id":"g2_p6_label","x":590,"y":45,"text":"Page 6: Album / 共享相册","fontSize":15,"fontFamily":1,"strokeColor":"#757575","originalText":"Page 6: Album / 共享相册","autoResize":true},
+
+    {"type":"rectangle","id":"p6_frame","x":580,"y":75,"width":220,"height":420,"roundness":{"type":3},"backgroundColor":"#f5f5f5","fillStyle":"solid","strokeColor":"#1e1e1e","strokeWidth":2,"boundElements":[]},
+    {"type":"rectangle","id":"p6_top","x":580,"y":75,"width":220,"height":45,"backgroundColor":"#a5d8ff","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#4a9eed","strokeWidth":1,"boundElements":[]},
+    {"type":"text","id":"p6_back","x":588,"y":86,"width":20,"height":22,"text":"<","fontSize":16,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"center","verticalAlign":"middle","autoResize":true},
+    {"type":"text","id":"p6_title","x":620,"y":86,"width":80,"height":22,"text":"共享相册","fontSize":16,"fontFamily":1,"strokeColor":"#1e1e1e","textAlign":"center","verticalAlign":"middle","autoResize":true},
+    {"type":"text","id":"p6_add","x":760,"y":86,"width":22,"height":22,"text":"+","fontSize":18,"fontFamily":1,"strokeColor":"#4a9eed","textAlign":"center","verticalAlign":"middle","autoResize":true},
+
+    {"type":"rectangle","id":"p6_tab","x":580,"y":120,"width":220,"height":30,"backgroundColor":"#ffffff","fillStyle":"solid","strokeColor":"#e0e0e0","boundElements":[]},
+    {"type":"text","id":"p6_t1","x":595,"y":127,"width":50,"height":16,"text":"全部","fontSize":13,"fontFamily":1,"strokeColor":"#4a9eed","textAlign":"left","verticalAlign":"middle","autoResize":true},
+    {"type":"text","id":"p6_t2","x":650,"y":127,"width":50,"height":16,"text":"我的","fontSize":13,"fontFamily":1,"strokeColor":"#757575","textAlign":"left","verticalAlign":"middle","autoResize":true},
+    {"type":"text","id":"p6_t3","x":705,"y":127,"width":50,"height":16,"text":"Ta的","fontSize":13,"fontFamily":1,"strokeColor":"#757575","textAlign":"left","verticalAlign":"middle","autoResize":true},
+
+    {"type":"rectangle","id":"p6_grid","x":590,"y":160,"width":200,"height":280,"backgroundColor":"#ffffff","fillStyle":"solid","strokeColor":"transparent","boundElements":[]},
+    {"type":"rectangle","id":"p6_photo1","x":595,"y":165,"width":90,"height":90,"backgroundColor":"#ffc9c9","fillStyle":"solid","strokeColor":"#ef4444","boundElements":[]},
+    {"type":"text","id":"p6_p1","x":608,"y":197,"width":64,"height":26,"text":"照片1","fontSize":13,"fontFamily":1,"strokeColor":"#ef4444","textAlign":"center","verticalAlign":"middle","autoResize":true},
+    {"type":"rectangle","id":"p6_photo2","x":695,"y":165,"width":90,"height":90,"backgroundColor":"#a5d8ff","fillStyle":"solid","strokeColor":"#4a9eed","boundElements":[]},
+    {"type":"text","id":"p6_p2","x":708,"y":197,"width":64,"height":26,"text":"照片2","fontSize":13,"fontFamily":1,"strokeColor":"#4a9eed","textAlign":"center","verticalAlign":"middle","autoResize":true},
+    {"type":"rectangle","id":"p6_photo3","x":595,"y":265,"width":90,"height":90,"backgroundColor":"#b2f2bb","fillStyle":"solid","strokeColor":"#22c55e","boundElements":[]},
+    {"type":"text","id":"p6_p3","x":608,"y":297,"width":64,"height":26,"text":"照片3","fontSize":13,"fontFamily":1,"strokeColor":"#22c55e","textAlign":"center","verticalAlign":"middle","autoResize":true},
+    {"type":"rectangle","id":"p6_photo4","x":695,"y":265,"width":90,"height":90,"backgroundColor":"#ffd8a8","fillStyle":"solid","strokeColor":"#f59e0b","boundElements":[]},
+    {"type":"text","id":"p6_p4","x":708,"y":297,"width":64,"height":26,"text":"照片4","fontSize":13,"fontFamily":1,"strokeColor":"#f59e0b","textAlign":"center","verticalAlign":"middle","autoResize":true},
+    {"type":"rectangle","id":"p6_photo5","x":595,"y":365,"width":90,"height":90,"backgroundColor":"#d0bfff","fillStyle":"solid","strokeColor":"#8b5cf6","boundElements":[]},
+    {"type":"text","id":"p6_p5","x":608,"y":397,"width":64,"height":26,"text":"照片5","fontSize":13,"fontFamily":1,"strokeColor":"#8b5cf6","textAlign":"center","verticalAlign":"middle","autoResize":true},
+    {"type":"rectangle","id":"p6_photo6","x":695,"y":365,"width":90,"height":90,"backgroundColor":"#eebefa","fillStyle":"solid","strokeColor":"#ec4899","boundElements":[]},
+    {"type":"text","id":"p6_p6","x":708,"y":397,"width":64,"height":26,"text":"照片6","fontSize":13,"fontFamily":1,"strokeColor":"#ec4899","textAlign":"center","verticalAlign":"middle","autoResize":true},
+
+    {"type":"rectangle","id":"p6_fab","x":740,"y":445,"width":50,"height":50,"backgroundColor":"#4a9eed","fillStyle":"solid","roundness":{"type":3},"strokeColor":"#4a9eed","boundElements":[]},
+    {"type":"text","id":"p6_fab_t","x":750,"y":463,"width":30,"height":14,"text":"+","fontSize":20,"fontFamily":1,"strokeColor":"#ffffff","textAlign":"center","verticalAlign":"middle","autoResize":true}
+  ],
+  "appState": {"viewBackgroundColor": "#ffffff"}
+}
