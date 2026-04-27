@@ -1,170 +1,124 @@
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:get/get.dart';
-
-import '../config/constants.dart';
 import '../models/anniversary_model.dart';
 
-/// 纪念日服务
-class AnniversaryService extends GetxService {
-  final FlutterSecureStorage _storage = Get.find<FlutterSecureStorage>();
+/// 纪念日服务（当前为 Mock）
+class AnniversaryService {
+  final List<Anniversary> _store = <Anniversary>[
+    Anniversary(
+      objectId: 'ann_1',
+      relationId: 'relation_001',
+      title: '恋爱纪念日',
+      date: DateTime(2021, 5, 20),
+      type: AnniversaryType.love,
+      repeatType: AnniversaryRepeatType.yearly,
+      reminderEnabled: true,
+      reminderTime: DateTime(2026, 4, 27, 9, 0),
+      note: '每年都要去吃那家烤肉',
+      createdBy: 'mock_user_001',
+      createdAt: DateTime(2021, 5, 20, 12, 0),
+      updatedAt: DateTime(2026, 4, 1, 12, 0),
+    ),
+    Anniversary(
+      objectId: 'ann_2',
+      relationId: 'relation_001',
+      title: 'Ta 的生日',
+      date: DateTime(1998, 8, 11),
+      type: AnniversaryType.birthday,
+      repeatType: AnniversaryRepeatType.yearly,
+      reminderEnabled: true,
+      reminderTime: DateTime(2026, 4, 27, 10, 0),
+      note: null,
+      createdBy: 'user_partner',
+      createdAt: DateTime(2022, 1, 6, 18, 0),
+      updatedAt: DateTime(2025, 12, 24, 20, 30),
+    ),
+  ];
 
-  /// 获取纪念日列表
-  Future<List<AnniversaryModel>> getAnniversaryList(String relationId) async {
-    try {
-      final key = '${AppConstants.keyAnniversaryList}_$relationId';
-      final data = await _storage.read(key: key);
-      if (data == null || data.isEmpty) return [];
-
-      // 解析存储的 JSON 数据
-      final List<dynamic> jsonList = _parseJsonList(data);
-      return jsonList
-          .map((json) => AnniversaryModel.fromJson(json as Map<String, dynamic>))
-          .toList()
-        ..sort((a, b) => a.date.compareTo(b.date));
-    } catch (e) {
-      return [];
-    }
+  Future<List<Anniversary>> getAnniversaryList({required String relationId}) async {
+    await Future.delayed(const Duration(milliseconds: 220));
+    final list = _store.where((item) => item.relationId == relationId).toList()
+      ..sort((a, b) => calculateCountdown(a).compareTo(calculateCountdown(b)));
+    return list;
   }
 
-  /// 创建纪念日
-  Future<AnniversaryModel?> createAnniversary({
-    required String relationId,
-    required String title,
-    required DateTime date,
-    required AnniversaryType type,
-    required RepeatType repeatType,
-    required bool reminderEnabled,
-    DateTime? reminderTime,
-    String? note,
-    String? createdBy,
-  }) async {
-    try {
-      final id = 'ann_${DateTime.now().millisecondsSinceEpoch}';
-      final now = DateTime.now();
-      final anniversary = AnniversaryModel(
-        id: id,
-        relationId: relationId,
-        title: title,
-        date: date,
-        type: type,
-        repeatType: repeatType,
-        reminderEnabled: reminderEnabled,
-        reminderTime: reminderTime,
-        note: note,
-        createdBy: createdBy,
-        createdAt: now,
-        updatedAt: now,
-      );
+  Future<Anniversary> createAnniversary({required Anniversary anniversary}) async {
+    await Future.delayed(const Duration(milliseconds: 340));
+    final now = DateTime.now();
+    final created = anniversary.copyWith(
+      objectId: 'ann_${now.millisecondsSinceEpoch}',
+      createdAt: now,
+      updatedAt: now,
+    );
+    _store.add(created);
+    return created;
+  }
 
-      final list = await getAnniversaryList(relationId);
-      list.add(anniversary);
-      await _saveAnniversaryList(relationId, list);
-
-      return anniversary;
-    } catch (e) {
+  Future<Anniversary?> updateAnniversary({required Anniversary anniversary}) async {
+    await Future.delayed(const Duration(milliseconds: 280));
+    final index = _store.indexWhere((item) => item.objectId == anniversary.objectId);
+    if (index < 0) {
       return null;
     }
+    final updated = anniversary.copyWith(updatedAt: DateTime.now());
+    _store[index] = updated;
+    return updated;
   }
 
-  /// 更新纪念日
-  Future<bool> updateAnniversary(String id, Map<String, dynamic> updates) async {
-    try {
-      final relationId = updates['relationId'] as String?;
-      if (relationId == null) return false;
-
-      final list = await getAnniversaryList(relationId);
-      final index = list.indexWhere((a) => a.id == id);
-      if (index == -1) return false;
-
-      final existing = list[index];
-      final updated = existing.copyWith(
-        title: updates['title'] as String? ?? existing.title,
-        date: updates['date'] as DateTime? ?? existing.date,
-        type: updates['type'] as AnniversaryType? ?? existing.type,
-        repeatType: updates['repeatType'] as RepeatType? ?? existing.repeatType,
-        reminderEnabled: updates['reminderEnabled'] as bool? ?? existing.reminderEnabled,
-        reminderTime: updates['reminderTime'] as DateTime? ?? existing.reminderTime,
-        note: updates['note'] as String? ?? existing.note,
-        updatedAt: DateTime.now(),
-      );
-
-      list[index] = updated;
-      await _saveAnniversaryList(relationId, list);
-      return true;
-    } catch (e) {
-      return false;
-    }
+  Future<bool> deleteAnniversary({required String objectId}) async {
+    await Future.delayed(const Duration(milliseconds: 200));
+    return _store.removeWhere((item) => item.objectId == objectId) > 0;
   }
 
-  /// 删除纪念日
-  Future<bool> deleteAnniversary(String id, String relationId) async {
-    try {
-      final list = await getAnniversaryList(relationId);
-      list.removeWhere((a) => a.id == id);
-      await _saveAnniversaryList(relationId, list);
-      return true;
-    } catch (e) {
-      return false;
-    }
+  Future<List<Anniversary>> getUpcomingAnniversaries({
+    required String relationId,
+    int withinDays = 30,
+  }) async {
+    final list = await getAnniversaryList(relationId: relationId);
+    return list.where((item) {
+      final days = calculateCountdown(item);
+      return days >= 0 && days <= withinDays;
+    }).toList();
   }
 
-  /// 获取即将到来的纪念日
-  Future<List<AnniversaryModel>> getUpcomingAnniversaries(String relationId, {int limit = 5}) async {
-    final list = await getAnniversaryList(relationId);
-    final upcoming = list.where((a) => a.countdownDays >= 0).toList()
-      ..sort((a, b) => a.countdownDays.compareTo(b.countdownDays));
-    return upcoming.take(limit).toList();
-  }
+  int calculateCountdown(Anniversary anniversary, {DateTime? fromDate}) {
+    final base = fromDate ?? DateTime.now();
+    final now = DateTime(base.year, base.month, base.day);
+    final source = DateTime(
+      anniversary.date.year,
+      anniversary.date.month,
+      anniversary.date.day,
+    );
 
-  /// 计算倒计时天数
-  int calculateCountdown(DateTime date, RepeatType repeatType) {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    var targetDate = DateTime(date.year, date.month, date.day);
+    DateTime next = source;
 
-    switch (repeatType) {
-      case RepeatType.none:
-        return targetDate.difference(today).inDays;
-
-      case RepeatType.yearly:
-        while (targetDate.isBefore(today) || targetDate.isAtSameMomentAs(today)) {
-          targetDate = DateTime(targetDate.year + 1, targetDate.month, targetDate.day);
+    switch (anniversary.repeatType) {
+      case AnniversaryRepeatType.none:
+        next = source;
+        break;
+      case AnniversaryRepeatType.yearly:
+        next = DateTime(now.year, source.month, source.day);
+        if (next.isBefore(now)) {
+          next = DateTime(now.year + 1, source.month, source.day);
         }
-        return targetDate.difference(today).inDays;
-
-      case RepeatType.monthly:
-        while (targetDate.isBefore(today) || targetDate.isAtSameMomentAs(today)) {
-          final nextMonth = targetDate.month + 1;
-          final year = targetDate.year + (nextMonth > 12 ? 1 : 0);
-          final month = nextMonth > 12 ? 1 : nextMonth;
-          final day = date.day;
-          final maxDay = DateTime(year, month + 1, 0).day;
-          targetDate = DateTime(year, month, day > maxDay ? maxDay : day);
+        break;
+      case AnniversaryRepeatType.monthly:
+        next = DateTime(now.year, now.month, source.day);
+        if (next.isBefore(now)) {
+          next = DateTime(now.year, now.month + 1, source.day);
         }
-        return targetDate.difference(today).inDays;
-
-      case RepeatType.weekly:
-        while (targetDate.isBefore(today) || targetDate.isAtSameMomentAs(today)) {
-          targetDate = targetDate.add(const Duration(days: 7));
+        break;
+      case AnniversaryRepeatType.weekly:
+        final weekday = source.weekday;
+        next = now;
+        while (next.weekday != weekday || next.isBefore(now)) {
+          next = next.add(const Duration(days: 1));
         }
-        return targetDate.difference(today).inDays;
+        break;
     }
-  }
 
-  /// 保存纪念日列表
-  Future<void> _saveAnniversaryList(String relationId, List<AnniversaryModel> list) async {
-    final key = '${AppConstants.keyAnniversaryList}_$relationId';
-    final jsonList = list.map((a) => a.toJson()).toList();
-    await _storage.write(key: key, value: jsonList.toString());
-  }
-
-  /// 解析 JSON 列表字符串
-  List<dynamic> _parseJsonList(String data) {
-    try {
-      // 简单解析：实际项目中应该使用 jsonDecode
-      return [];
-    } catch (e) {
-      return [];
+    if (anniversary.repeatType == AnniversaryRepeatType.none && next.isBefore(now)) {
+      return -now.difference(next).inDays;
     }
+
+    return next.difference(now).inDays;
   }
 }

@@ -1,61 +1,34 @@
 import 'package:equatable/equatable.dart';
 
-/// 心情类型枚举
+/// 心情类型
 enum MoodType {
-  happy('happy', '开心'),
-  excited('excited', '兴奋'),
-  calm('calm', '平静'),
-  worried('worried', '担忧'),
-  sad('sad', '难过'),
-  angry('angry', '生气');
+  happy,
+  excited,
+  calm,
+  worried,
+  sad,
+  angry;
 
-  final String value;
-  final String label;
-
-  const MoodType(this.value, this.label);
-
-  static MoodType? fromString(String? value) {
-    if (value == null) return null;
+  static MoodType fromString(String? value) {
     return MoodType.values.firstWhere(
-      (e) => e.value == value,
+      (item) => item.name == value,
       orElse: () => MoodType.calm,
     );
   }
 }
 
-/// 心情记录模型
+/// 心情记录
 class MoodRecord extends Equatable {
-  /// 记录 ID
   final String objectId;
-
-  /// 关系 ID
   final String relationId;
-
-  /// 用户 ID
   final String userId;
-
-  /// 心情类型
   final MoodType moodType;
-
-  /// 心情分值 1-5
   final int moodScore;
-
-  /// 心情文案
   final String? content;
-
-  /// 图片 URL 列表（最多 3 张）
   final List<String> imageUrls;
-
-  /// 是否对伴侣可见
   final bool visibleToPartner;
-
-  /// 记录日期
   final DateTime recordDate;
-
-  /// 创建时间
   final DateTime createdAt;
-
-  /// 更新时间
   final DateTime updatedAt;
 
   const MoodRecord({
@@ -65,51 +38,47 @@ class MoodRecord extends Equatable {
     required this.moodType,
     required this.moodScore,
     this.content,
-    this.imageUrls = const [],
-    this.visibleToPartner = true,
+    this.imageUrls = const <String>[],
+    required this.visibleToPartner,
     required this.recordDate,
     required this.createdAt,
     required this.updatedAt,
   });
 
-  /// 从 JSON 创建
   factory MoodRecord.fromJson(Map<String, dynamic> json) {
     return MoodRecord(
-      objectId: json['objectId'] ?? json['id'] ?? '',
-      relationId: json['relationId'] ?? '',
-      userId: json['userId'] ?? '',
-      moodType: MoodType.fromString(json['moodType']) ?? MoodType.calm,
-      moodScore: (json['moodScore'] is int)
-          ? json['moodScore']
-          : int.tryParse(json['moodScore']?.toString() ?? '3') ?? 3,
-      content: json['content'],
-      imageUrls: (json['imageUrls'] as List<dynamic>?)
-              ?.map((e) => e.toString())
-              .toList() ??
-          [],
-      visibleToPartner: json['visibleToPartner'] ?? true,
-      recordDate: _parseDateTime(json['recordDate']),
-      createdAt: _parseDateTime(json['createdAt']),
-      updatedAt: _parseDateTime(json['updatedAt']),
+      objectId: (json['objectId'] ?? json['id'] ?? '').toString(),
+      relationId: (json['relationId'] ?? '').toString(),
+      userId: (json['userId'] ?? '').toString(),
+      moodType: MoodType.fromString(json['moodType']?.toString()),
+      moodScore: (json['moodScore'] as num?)?.toInt() ?? 3,
+      content: json['content']?.toString(),
+      imageUrls: (json['imageUrls'] as List<dynamic>? ?? const <dynamic>[])
+          .map((item) => item.toString())
+          .toList(),
+      visibleToPartner: json['visibleToPartner'] != false,
+      recordDate: _parseDateTime(json['recordDate']) ?? DateTime.now(),
+      createdAt: _parseDateTime(json['createdAt']) ?? DateTime.now(),
+      updatedAt: _parseDateTime(json['updatedAt']) ?? DateTime.now(),
     );
   }
 
-  /// 安全解析 DateTime
-  static DateTime _parseDateTime(dynamic value) {
-    if (value is DateTime) return value;
-    if (value is String) {
-      return DateTime.tryParse(value) ?? DateTime.now();
+  static DateTime? _parseDateTime(dynamic value) {
+    if (value is DateTime) {
+      return value;
     }
-    return DateTime.now();
+    if (value is String) {
+      return DateTime.tryParse(value);
+    }
+    return null;
   }
 
-  /// 转为 JSON
   Map<String, dynamic> toJson() {
     return {
       'objectId': objectId,
       'relationId': relationId,
       'userId': userId,
-      'moodType': moodType.value,
+      'moodType': moodType.name,
       'moodScore': moodScore,
       'content': content,
       'imageUrls': imageUrls,
@@ -120,7 +89,6 @@ class MoodRecord extends Equatable {
     };
   }
 
-  /// 复制并修改
   MoodRecord copyWith({
     String? objectId,
     String? relationId,
@@ -147,30 +115,6 @@ class MoodRecord extends Equatable {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
-  }
-
-  /// 获取心情 emoji
-  String get moodEmoji {
-    switch (moodType) {
-      case MoodType.happy:
-        return '😊';
-      case MoodType.excited:
-        return '🤩';
-      case MoodType.calm:
-        return '😌';
-      case MoodType.worried:
-        return '😟';
-      case MoodType.sad:
-        return '😢';
-      case MoodType.angry:
-        return '😠';
-    }
-  }
-
-  /// 获取心情文案预览（最多20字）
-  String? get contentPreview {
-    if (content == null || content!.isEmpty) return null;
-    return content!.length > 20 ? '${content!.substring(0, 20)}...' : content;
   }
 
   @override

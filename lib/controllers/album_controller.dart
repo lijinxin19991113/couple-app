@@ -13,7 +13,7 @@ class AlbumController extends GetxController {
   UserController get _userController => Get.find<UserController>();
 
   /// 照片列表
-  final photos = <AlbumPhotoModel>[].obs;
+  final photos = <AlbumPhoto>[].obs;
 
   /// 加载状态
   final isLoading = false.obs;
@@ -23,15 +23,6 @@ class AlbumController extends GetxController {
 
   /// 是否有更多数据
   final hasMore = true.obs;
-
-  /// 当前页码
-  int _currentPage = 1;
-
-  /// 每页大小
-  static const int _pageSize = 20;
-
-  /// 当前筛选的年月（null表示全部）
-  String? _currentYearMonth;
 
   @override
   void onInit() {
@@ -47,29 +38,18 @@ class AlbumController extends GetxController {
   String get _relationId =>
       _userController.coupleRelation.value?.id ?? '';
 
-  /// 获取当前用户名称
-  String get _currentUserName =>
-      _userController.currentUser.value?.nickname ?? '';
-
   /// 加载照片列表
   Future<void> loadPhotos({String? yearMonth}) async {
     if (!mounted) return;
     isLoading.value = true;
-    _currentYearMonth = yearMonth;
-    _currentPage = 1;
-    hasMore.value = true;
 
     try {
       final result = await _albumService.getAlbumPhotos(
         relationId: _relationId,
-        page: _currentPage,
-        pageSize: _pageSize,
-        yearMonth: yearMonth,
       );
 
       if (!mounted) return;
       photos.value = result;
-      hasMore.value = result.length >= _pageSize;
     } catch (e) {
       if (!mounted) return;
       Get.snackbar('错误', '加载照片失败: $e');
@@ -81,30 +61,7 @@ class AlbumController extends GetxController {
 
   /// 加载更多照片
   Future<void> loadMore() async {
-    if (!mounted || isLoading.value || !hasMore.value) return;
-
-    isLoading.value = true;
-    _currentPage++;
-
-    try {
-      final result = await _albumService.getAlbumPhotos(
-        relationId: _relationId,
-        page: _currentPage,
-        pageSize: _pageSize,
-        yearMonth: _currentYearMonth,
-      );
-
-      if (!mounted) return;
-      photos.addAll(result);
-      hasMore.value = result.length >= _pageSize;
-    } catch (e) {
-      if (!mounted) return;
-      _currentPage--;
-      Get.snackbar('错误', '加载更多照片失败: $e');
-    } finally {
-      if (!mounted) return;
-      isLoading.value = false;
-    }
+    // 当前为简单实现，暂不支持分页
   }
 
   /// 上传照片
@@ -114,7 +71,7 @@ class AlbumController extends GetxController {
     DateTime? shotAt,
     String? locationText,
     List<String> tags = const [],
-    PhotoVisibility visibility = PhotoVisibility.both,
+    AlbumVisibility visibility = AlbumVisibility.both,
   }) async {
     if (!mounted) return false;
     uploadProgress.value = 0.0;
@@ -130,8 +87,7 @@ class AlbumController extends GetxController {
       final photo = await _albumService.uploadPhoto(
         relationId: _relationId,
         uploaderId: _currentUserId,
-        uploaderName: _currentUserName,
-        localFilePath: localFilePath,
+        localPath: localFilePath,
         caption: caption,
         shotAt: shotAt,
         locationText: locationText,
@@ -155,7 +111,7 @@ class AlbumController extends GetxController {
   /// 删除照片
   Future<bool> deletePhoto(String photoId) async {
     try {
-      final success = await _albumService.deletePhoto(photoId);
+      final success = await _albumService.deletePhoto(photoId: photoId);
       if (!mounted) return false;
 
       if (success) {
@@ -176,7 +132,10 @@ class AlbumController extends GetxController {
   /// 更新照片文案
   Future<bool> updateCaption(String photoId, String caption) async {
     try {
-      final updated = await _albumService.updatePhotoCaption(photoId, caption);
+      final updated = await _albumService.updatePhotoCaption(
+        photoId: photoId,
+        caption: caption,
+      );
       if (!mounted) return false;
 
       if (updated != null) {
@@ -198,9 +157,9 @@ class AlbumController extends GetxController {
   }
 
   /// 获取照片详情
-  Future<AlbumPhotoModel?> getPhotoDetail(String photoId) async {
+  Future<AlbumPhoto?> getPhotoDetail(String photoId) async {
     try {
-      return await _albumService.getPhotoDetail(photoId);
+      return await _albumService.getPhotoDetail(photoId: photoId);
     } catch (e) {
       if (!mounted) return null;
       Get.snackbar('错误', '获取照片详情失败: $e');
@@ -208,23 +167,14 @@ class AlbumController extends GetxController {
     }
   }
 
-  /// 获取可用年月列表
-  Future<List<String>> getAvailableYearMonths() async {
-    try {
-      return await _albumService.getAvailableYearMonths(_relationId);
-    } catch (e) {
-      return [];
-    }
-  }
-
   /// 判断当前用户是否为照片上传者
-  bool isUploader(AlbumPhotoModel photo) {
+  bool isUploader(AlbumPhoto photo) {
     return photo.uploaderId == _currentUserId;
   }
 
   /// 按年月分组照片
-  Map<String, List<AlbumPhotoModel>> groupPhotosByYearMonth() {
-    final grouped = <String, List<AlbumPhotoModel>>{};
+  Map<String, List<AlbumPhoto>> groupPhotosByYearMonth() {
+    final grouped = <String, List<AlbumPhoto>>{};
     for (final photo in photos) {
       final time = photo.shotAt ?? photo.createdAt;
       final key = '${time.year}年${time.month}月';

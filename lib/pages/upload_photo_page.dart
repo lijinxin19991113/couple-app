@@ -36,7 +36,7 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
   final List<String> _tags = [];
 
   // 可见性
-  PhotoVisibility _visibility = PhotoVisibility.both;
+  AlbumVisibility _visibility = AlbumVisibility.both;
 
   // 上传中状态
   bool _isUploading = false;
@@ -361,15 +361,15 @@ class _UploadPhotoPageState extends State<UploadPhotoPage> {
           Obx(() => Switch(
                 value: _controller.uploadProgress.value > 0 &&
                         _controller.uploadProgress.value < 1
-                    ? _visibility == PhotoVisibility.both
-                    : _visibility == PhotoVisibility.both,
+                    ? _visibility == AlbumVisibility.both
+                    : _visibility == AlbumVisibility.both,
                 onChanged: _isUploading
                     ? null
                     : (value) {
                         setState(() {
                           _visibility = value
-                              ? PhotoVisibility.both
-                              : PhotoVisibility.private;
+                              ? AlbumVisibility.both
+                              : AlbumVisibility.private;
                         });
                       },
                 activeColor: AppColors.primary,

@@ -18,7 +18,7 @@ class _PhotoViewPageState extends State<PhotoViewPage> {
   final AlbumController _controller = Get.find<AlbumController>();
 
   late String _photoId;
-  AlbumPhotoModel? _photo;
+  AlbumPhoto? _photo;
   bool _isLoading = true;
 
   // 缩放控制器
@@ -177,20 +177,6 @@ class _PhotoViewPageState extends State<PhotoViewPage> {
                           const TextStyle(color: Colors.white54, fontSize: 14),
                       overflow: TextOverflow.ellipsis,
                     ),
-                  ),
-                ],
-              ),
-            ],
-            // 上传者
-            if (_photo!.uploaderName != null) ...[
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  const Icon(Icons.person, color: Colors.white54, size: 16),
-                  const SizedBox(width: 4),
-                  Text(
-                    _photo!.uploaderName!,
-                    style: const TextStyle(color: Colors.white54, fontSize: 14),
                   ),
                 ],
               ),

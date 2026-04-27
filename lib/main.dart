@@ -4,9 +4,11 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 
 import 'app/app.dart';
+import 'controllers/album_controller.dart';
 import 'controllers/auth_controller.dart';
 import 'controllers/user_controller.dart';
 import 'core/storage/storage_service.dart';
+import 'services/album_service.dart';
 
 /// 应用入口
 Future<void> main() async {
@@ -30,9 +32,13 @@ Future<void> main() async {
   await storageService.init();
   Get.put<StorageService>(storageService, permanent: true);
 
+  // 初始化 AlbumService
+  Get.put<AlbumService>(AlbumService(), permanent: true);
+
   // 注册全局控制器
   Get.put<AuthController>(AuthController(), permanent: true);
   Get.put<UserController>(UserController(), permanent: true);
+  Get.put<AlbumController>(AlbumController(), permanent: true);
 
   runApp(const CoupleApp());
 }

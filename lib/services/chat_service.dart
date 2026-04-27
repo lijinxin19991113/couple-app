@@ -2,201 +2,237 @@ import 'dart:async';
 
 import '../models/chat_message_model.dart';
 
-/// 聊天服务
+/// 聊天服务（当前为 Mock 实现）
 class ChatService {
-  // 模拟数据存储
-  final Map<String, List<ChatMessage>> _mockMessages = {};
-  final Map<String, StreamController<ChatMessage>> _messageStreams = {};
+  final Map<String, List<ChatMessage>> _messageStore = <String, List<ChatMessage>>{};
+  final Map<String, StreamController<ChatMessage>> _streamStore =
+      <String, StreamController<ChatMessage>>{};
 
-  /// 获取聊天消息
+  ChatService() {
+    _bootstrapMockData();
+  }
+
   Future<List<ChatMessage>> getChatMessages(
     String relationId, {
     DateTime? beforeTime,
-    int limit = 20,
+    int limit = 30,
   }) async {
-    // 模拟网络延迟
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 280));
 
-    final messages = _mockMessages[relationId] ?? [];
+    final source = List<ChatMessage>.from(_messageStore[relationId] ?? <ChatMessage>[])
+      ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
 
-    // 过滤时间之前的消息
-    var filtered = messages;
-    if (beforeTime != null) {
-      filtered = messages.where((m) => m.createdAt.isBefore(beforeTime)).toList();
+    final filtered = beforeTime == null
+        ? source
+        : source.where((item) => item.createdAt.isBefore(beforeTime)).toList();
+
+    if (filtered.length <= limit) {
+      return filtered;
     }
-
-    // 按时间倒序，返回指定数量
-    filtered.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-    return filtered.take(limit).toList().reversed.toList();
+    return filtered.sublist(filtered.length - limit);
   }
 
-  /// 发送文本消息
-  Future<ChatMessage> sendTextMessage(
-    String relationId,
-    String content, {
+  Future<ChatMessage> sendTextMessage({
+    required String relationId,
     required String senderId,
     required String receiverId,
+    required String content,
   }) async {
-    final clientMsgId = 'msg_${DateTime.now().millisecondsSinceEpoch}';
-    final message = ChatMessage(
-      objectId: clientMsgId,
-      clientMsgId: clientMsgId,
+    final now = DateTime.now();
+    final tempId = 'tmp_${now.microsecondsSinceEpoch}';
+    var message = ChatMessage(
+      objectId: tempId,
+      clientMsgId: tempId,
       relationId: relationId,
       senderId: senderId,
       receiverId: receiverId,
       messageType: ChatMessageType.text,
       content: content,
       sendStatus: ChatSendStatus.sending,
-      createdAt: DateTime.now(),
+      createdAt: now,
     );
 
-    // 添加到本地存储
-    _mockMessages.putIfAbsent(relationId, () => []);
-    _mockMessages[relationId]!.add(message);
+    _appendMessage(relationId, message);
 
-    // 模拟发送成功
-    await Future.delayed(const Duration(milliseconds: 300));
+    await Future.delayed(const Duration(milliseconds: 380));
 
-    final sentMessage = message.copyWith(sendStatus: ChatSendStatus.sent);
-    _updateMessage(relationId, clientMsgId, sentMessage);
+    if (content.contains('fail')) {
+      message = message.copyWith(sendStatus: ChatSendStatus.failed);
+      _replaceMessage(relationId, message);
+      return message;
+    }
 
-    // 通知新消息
-    _notifyNewMessage(relationId, sentMessage);
-
-    return sentMessage;
+    message = message.copyWith(
+      objectId: 'msg_${now.millisecondsSinceEpoch}',
+      sendStatus: ChatSendStatus.sent,
+    );
+    _replaceMessage(relationId, message);
+    _notify(relationId, message);
+    return message;
   }
 
-  /// 发送图片消息
-  Future<ChatMessage> sendImageMessage(
-    String relationId,
-    String localFilePath, {
-    String? caption,
+  Future<ChatMessage> sendImageMessage({
+    required String relationId,
     required String senderId,
     required String receiverId,
+    required String localPath,
+    String? caption,
   }) async {
-    final clientMsgId = 'msg_${DateTime.now().millisecondsSinceEpoch}';
-    final message = ChatMessage(
-      objectId: clientMsgId,
-      clientMsgId: clientMsgId,
+    final now = DateTime.now();
+    final tempId = 'tmp_img_${now.microsecondsSinceEpoch}';
+    var message = ChatMessage(
+      objectId: tempId,
+      clientMsgId: tempId,
       relationId: relationId,
       senderId: senderId,
       receiverId: receiverId,
       messageType: ChatMessageType.image,
       content: caption,
-      mediaUrl: localFilePath, // 模拟上传后返回 URL
+      mediaUrl: localPath,
+      mediaThumbnailUrl: localPath,
+      mediaWidth: 960,
+      mediaHeight: 1280,
       sendStatus: ChatSendStatus.sending,
-      createdAt: DateTime.now(),
+      createdAt: now,
     );
 
-    // 添加到本地存储
-    _mockMessages.putIfAbsent(relationId, () => []);
-    _mockMessages[relationId]!.add(message);
+    _appendMessage(relationId, message);
 
-    // 模拟上传延迟
-    await Future.delayed(const Duration(seconds: 1));
+    await Future.delayed(const Duration(milliseconds: 750));
 
-    final sentMessage = message.copyWith(sendStatus: ChatSendStatus.sent);
-    _updateMessage(relationId, clientMsgId, sentMessage);
+    if (localPath.contains('fail')) {
+      message = message.copyWith(sendStatus: ChatSendStatus.failed);
+      _replaceMessage(relationId, message);
+      return message;
+    }
 
-    // 通知新消息
-    _notifyNewMessage(relationId, sentMessage);
-
-    return sentMessage;
+    message = message.copyWith(
+      objectId: 'img_${now.millisecondsSinceEpoch}',
+      sendStatus: ChatSendStatus.sent,
+      mediaUrl:
+          'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=900&q=80',
+      mediaThumbnailUrl:
+          'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=360&q=80',
+    );
+    _replaceMessage(relationId, message);
+    _notify(relationId, message);
+    return message;
   }
 
-  /// 将消息标记为已读
-  Future<void> markMessagesAsRead(String relationId, String lastReadMsgId) async {
-    await Future.delayed(const Duration(milliseconds: 100));
+  Future<void> markMessagesAsRead({
+    required String relationId,
+    required String readerId,
+  }) async {
+    await Future.delayed(const Duration(milliseconds: 160));
 
-    final messages = _mockMessages[relationId];
-    if (messages == null) return;
+    final list = _messageStore[relationId];
+    if (list == null) {
+      return;
+    }
+    final now = DateTime.now();
 
-    for (var i = 0; i < messages.length; i++) {
-      if (messages[i].objectId == lastReadMsgId ||
-          messages[i].clientMsgId == lastReadMsgId) {
-        // 标记此消息及之前的所有消息为已读
-        for (var j = 0; j <= i; j++) {
-          if (messages[j].sendStatus != ChatSendStatus.read) {
-            messages[j] = messages[j].copyWith(
-              sendStatus: ChatSendStatus.read,
-              readAt: DateTime.now(),
-            );
-          }
-        }
-        break;
+    for (var i = 0; i < list.length; i++) {
+      final item = list[i];
+      if (item.receiverId == readerId && item.sendStatus != ChatSendStatus.read) {
+        list[i] = item.copyWith(sendStatus: ChatSendStatus.read, readAt: now);
       }
     }
   }
 
-  /// 获取未读消息数量
-  Future<int> getUnreadCount(String relationId) async {
-    await Future.delayed(const Duration(milliseconds: 100));
+  Future<int> getUnreadCount({
+    required String relationId,
+    required String receiverId,
+  }) async {
+    await Future.delayed(const Duration(milliseconds: 120));
 
-    final messages = _mockMessages[relationId] ?? [];
-    return messages.where((m) => m.sendStatus != ChatSendStatus.read).length;
+    final list = _messageStore[relationId] ?? <ChatMessage>[];
+    return list
+        .where((item) =>
+            item.receiverId == receiverId && item.sendStatus != ChatSendStatus.read)
+        .length;
   }
 
-  /// 监听新消息
   Stream<ChatMessage> observeNewMessages(String relationId) {
-    _messageStreams.putIfAbsent(
+    _streamStore.putIfAbsent(
       relationId,
       () => StreamController<ChatMessage>.broadcast(),
     );
-    return _messageStreams[relationId]!.stream;
+    return _streamStore[relationId]!.stream;
   }
 
-  /// 通知新消息
-  void _notifyNewMessage(String relationId, ChatMessage message) {
-    final stream = _messageStreams[relationId];
-    if (stream != null && !stream.isClosed) {
-      stream.add(message);
+  void _appendMessage(String relationId, ChatMessage message) {
+    _messageStore.putIfAbsent(relationId, () => <ChatMessage>[]);
+    _messageStore[relationId]!.add(message);
+  }
+
+  void _replaceMessage(String relationId, ChatMessage message) {
+    final list = _messageStore[relationId];
+    if (list == null) {
+      return;
+    }
+    final index = list.indexWhere((item) => item.clientMsgId == message.clientMsgId);
+    if (index >= 0) {
+      list[index] = message;
     }
   }
 
-  /// 更新消息
-  void _updateMessage(String relationId, String clientMsgId, ChatMessage newMessage) {
-    final messages = _mockMessages[relationId];
-    if (messages == null) return;
-
-    final index = messages.indexWhere((m) => m.clientMsgId == clientMsgId);
-    if (index != -1) {
-      messages[index] = newMessage;
+  void _notify(String relationId, ChatMessage message) {
+    final controller = _streamStore[relationId];
+    if (controller != null && !controller.isClosed) {
+      controller.add(message);
     }
   }
 
-  /// 模拟收到对方消息（用于测试）
-  Future<void> simulateIncomingMessage(
-    String relationId,
-    String senderId,
-    String receiverId,
-    String content,
-  ) async {
-    await Future.delayed(const Duration(seconds: 2));
-
-    final clientMsgId = 'msg_${DateTime.now().millisecondsSinceEpoch}';
-    final message = ChatMessage(
-      objectId: clientMsgId,
-      clientMsgId: clientMsgId,
-      relationId: relationId,
-      senderId: senderId,
-      receiverId: receiverId,
-      messageType: ChatMessageType.text,
-      content: content,
-      sendStatus: ChatSendStatus.sent,
-      createdAt: DateTime.now(),
-    );
-
-    _mockMessages.putIfAbsent(relationId, () => []);
-    _mockMessages[relationId]!.add(message);
-
-    _notifyNewMessage(relationId, message);
+  void _bootstrapMockData() {
+    const relationId = 'relation_001';
+    _messageStore[relationId] = <ChatMessage>[
+      ChatMessage(
+        objectId: 'msg_1',
+        clientMsgId: 'msg_1',
+        relationId: relationId,
+        senderId: 'user_partner',
+        receiverId: 'mock_user_001',
+        messageType: ChatMessageType.text,
+        content: '今天下班一起吃火锅吗？',
+        sendStatus: ChatSendStatus.sent,
+        createdAt: DateTime(2026, 4, 27, 18, 20),
+      ),
+      ChatMessage(
+        objectId: 'msg_2',
+        clientMsgId: 'msg_2',
+        relationId: relationId,
+        senderId: 'mock_user_001',
+        receiverId: 'user_partner',
+        messageType: ChatMessageType.text,
+        content: '好呀，我先去排队～',
+        sendStatus: ChatSendStatus.read,
+        readAt: DateTime(2026, 4, 27, 18, 26),
+        createdAt: DateTime(2026, 4, 27, 18, 22),
+      ),
+      ChatMessage(
+        objectId: 'msg_3',
+        clientMsgId: 'msg_3',
+        relationId: relationId,
+        senderId: 'user_partner',
+        receiverId: 'mock_user_001',
+        messageType: ChatMessageType.image,
+        content: '路上看到超可爱的云',
+        mediaUrl:
+            'https://images.unsplash.com/photo-1534088568595-a066f410bcda?auto=format&fit=crop&w=900&q=80',
+        mediaThumbnailUrl:
+            'https://images.unsplash.com/photo-1534088568595-a066f410bcda?auto=format&fit=crop&w=320&q=80',
+        mediaWidth: 900,
+        mediaHeight: 1200,
+        sendStatus: ChatSendStatus.sent,
+        createdAt: DateTime(2026, 4, 27, 18, 30),
+      ),
+    ];
   }
 
-  /// 释放资源
   void dispose() {
-    for (final stream in _messageStreams.values) {
-      stream.close();
+    for (final controller in _streamStore.values) {
+      controller.close();
     }
-    _messageStreams.clear();
+    _streamStore.clear();
   }
 }

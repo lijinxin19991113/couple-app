@@ -10,6 +10,9 @@ import '../pages/profile_edit_page.dart';
 import '../pages/couple_profile_page.dart';
 import '../pages/chat_list_page.dart';
 import '../pages/chat_page.dart';
+import '../pages/album_page.dart';
+import '../pages/photo_view_page.dart';
+import '../pages/upload_photo_page.dart';
 
 /// 路由配置
 class AppRoutes {
@@ -25,6 +28,8 @@ class AppRoutes {
   static const String coupleProfile = '/couple-profile';
   static const String chatList = '/chat-list';
   static const String chat = '/chat';
+  static const String photoView = '/photo-view';
+  static const String uploadPhoto = '/upload-photo';
 
   // ===== 路由页面列表 =====
   static final List<GetPage> pages = [
@@ -71,6 +76,16 @@ class AppRoutes {
     GetPage(
       name: chat,
       page: () => const ChatPage(),
+      transition: Transition.rightToLeft,
+    ),
+    GetPage(
+      name: photoView,
+      page: () => const PhotoViewPage(),
+      transition: Transition.fade,
+    ),
+    GetPage(
+      name: uploadPhoto,
+      page: () => const UploadPhotoPage(),
       transition: Transition.rightToLeft,
     ),
   ];

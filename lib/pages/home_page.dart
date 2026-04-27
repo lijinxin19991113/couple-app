@@ -5,6 +5,7 @@ import '../config/colors.dart';
 import '../config/routes.dart';
 import '../controllers/user_controller.dart';
 import '../controllers/auth_controller.dart';
+import 'album_page.dart';
 
 /// 主页
 class HomePage extends StatefulWidget {
@@ -383,19 +384,7 @@ class _AlbumTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('相册')),
-      body: const Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.photo_library_outlined, size: 64, color: AppColors.gray3),
-            SizedBox(height: 16),
-            Text('相册功能开发中...', style: TextStyle(color: AppColors.gray3)),
-          ],
-        ),
-      ),
-    );
+    return const AlbumPage();
   }
 }
 
