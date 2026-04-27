@@ -7,9 +7,11 @@ import 'app/app.dart';
 import 'controllers/album_controller.dart';
 import 'controllers/auth_controller.dart';
 import 'controllers/user_controller.dart';
+import 'controllers/location_controller.dart';
 import 'core/storage/storage_service.dart';
 import 'services/album_service.dart';
 import 'services/wish_service.dart';
+import 'services/location_service.dart';
 import 'controllers/wish_controller.dart';
 
 /// 应用入口
@@ -40,11 +42,15 @@ Future<void> main() async {
   // 初始化 WishService
   Get.put<WishService>(WishService(), permanent: true);
 
+  // 初始化 LocationService
+  Get.put<LocationService>(LocationService(), permanent: true);
+
   // 注册全局控制器
   Get.put<AuthController>(AuthController(), permanent: true);
   Get.put<UserController>(UserController(), permanent: true);
   Get.put<AlbumController>(AlbumController(), permanent: true);
   Get.put<WishController>(WishController(), permanent: true);
+  Get.put<LocationController>(LocationController(), permanent: true);
 
   runApp(const CoupleApp());
 }

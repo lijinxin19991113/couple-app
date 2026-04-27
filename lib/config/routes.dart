@@ -17,6 +17,8 @@ import '../pages/anniversary_page.dart';
 import '../pages/anniversary_form_page.dart';
 import '../pages/mood_page.dart';
 import '../pages/mood_checkin_page.dart';
+import '../pages/location_share_page.dart';
+import '../pages/location_history_page.dart';
 import '../pages/diary_page.dart';
 import '../pages/diary_write_page.dart';
 import '../pages/diary_detail_page.dart';
@@ -42,6 +44,8 @@ class AppRoutes {
   static const String anniversaryForm = '/anniversary-form';
   static const String mood = '/mood';
   static const String moodCheckin = '/mood-checkin';
+  static const String locationShare = '/location-share';
+  static const String locationHistory = '/location-history';
   static const String diary = '/diary';
   static const String diaryWrite = '/diary-write';
   static const String diaryDetail = '/diary-detail';
@@ -126,6 +130,16 @@ class AppRoutes {
     GetPage(
       name: moodCheckin,
       page: () => const MoodCheckinPage(),
+      transition: Transition.rightToLeft,
+    ),
+    GetPage(
+      name: locationShare,
+      page: () => const LocationSharePage(),
+      transition: Transition.rightToLeft,
+    ),
+    GetPage(
+      name: locationHistory,
+      page: () => const LocationHistoryPage(),
       transition: Transition.rightToLeft,
     ),
     GetPage(
