@@ -84,10 +84,10 @@ class UserModel extends Equatable {
           ? DateTime.tryParse(json['lastActiveAt'])
           : null,
       createdAt: json['createdAt'] != null
-          ? DateTime.parse(json['createdAt'])
+          ? DateTime.tryParse(json['createdAt']) ?? DateTime.now()
           : DateTime.now(),
       updatedAt: json['updatedAt'] != null
-          ? DateTime.parse(json['updatedAt'])
+          ? DateTime.tryParse(json['updatedAt']) ?? DateTime.now()
           : DateTime.now(),
     );
   }

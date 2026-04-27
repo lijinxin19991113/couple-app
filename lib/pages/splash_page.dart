@@ -17,12 +17,12 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
   late Animation<double> _scaleAnimation;
+  bool _disposed = false;
 
   @override
   void initState() {
     super.initState();
 
-    // 动画配置
     _controller = AnimationController(
       duration: const Duration(milliseconds: 1500),
       vsync: this,
@@ -38,17 +38,18 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
 
     _controller.forward();
 
-    // 延迟跳转
     Future.delayed(const Duration(seconds: 2), () {
-      _navigateToNext();
+      if (!_disposed) _navigateToNext();
     });
   }
 
   void _navigateToNext() async {
+    if (!mounted) return;
     final authController = Get.find<AuthController>();
     await authController.checkLoginStatus();
+    if (!mounted) return;
 
-    if (authController.isLoggedIn) {
+    if (authController.isLoggedIn.value) {
       Get.offAllNamed(AppRoutes.home);
     } else {
       Get.offAllNamed(AppRoutes.login);
@@ -57,6 +58,7 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
 
   @override
   void dispose() {
+    _disposed = true;
     _controller.dispose();
     super.dispose();
   }

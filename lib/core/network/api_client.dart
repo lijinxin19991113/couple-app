@@ -1,6 +1,8 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:get/get.dart' as getx;
+import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 
 import '../../config/constants.dart';
@@ -18,8 +20,15 @@ class ApiResult<T> {
 /// Dio 网络客户端封装
 class ApiClient {
   late final Dio _dio;
+  late final Dio _refreshDio; // 独立的 Dio 实例用于刷新 Token，避免拦截器递归
   final FlutterSecureStorage _storage;
   final Logger _logger = Logger(printer: PrettyPrinter(printTime: true));
+
+  /// Token 刷新互斥锁，防止并发刷新
+  bool _isRefreshing = false;
+
+  /// 等待刷新的请求队列
+  final List<_RequestCompleter> _pendingRequests = [];
 
   ApiClient(this._storage) {
     _dio = Dio(
@@ -34,11 +43,18 @@ class ApiClient {
       ),
     );
 
-    // 添加拦截器
+    // 独立的 Dio 用于刷新 Token，不经过拦截器避免死循环
+    _refreshDio = Dio(
+      BaseOptions(
+        baseUrl: AppConstants.apiBaseUrl,
+        connectTimeout: Duration(milliseconds: AppConstants.apiTimeout),
+        receiveTimeout: Duration(milliseconds: AppConstants.apiTimeout),
+      ),
+    );
+
     _dio.interceptors.addAll([
-      _AuthInterceptor(_storage, _dio),
+      _AuthInterceptor(this),
       _LoggingInterceptor(_logger),
-      _ErrorInterceptor(),
     ]);
   }
 
@@ -191,22 +207,101 @@ class ApiClient {
     if (data is Map) return data['message'] ?? data['error'];
     return null;
   }
+
+  /// Token 刷新（互斥锁 + 重试上限）
+  Future<String?> _refreshToken() async {
+    if (_isRefreshing) return null;
+
+    _isRefreshing = true;
+
+    try {
+      final refreshToken = await _storage.read(key: AppConstants.keyRefreshToken);
+      if (refreshToken == null) {
+        return null;
+      }
+
+      // 使用独立 Dio 实例，避免拦截器递归
+      final response = await _refreshDio.post(
+        '${AppConstants.apiBaseUrl}/auth/refresh',
+        data: {'refresh_token': refreshToken},
+      );
+
+      if (response.statusCode == 200 && response.data != null) {
+        final newToken = response.data['access_token'] as String?;
+        if (newToken != null) {
+          await _storage.write(key: AppConstants.keyAccessToken, value: newToken);
+          return newToken;
+        }
+      }
+
+      return null;
+    } catch (e) {
+      _logger.e('Token refresh failed: $e');
+      return null;
+    } finally {
+      _isRefreshing = false;
+    }
+  }
+
+  /// 处理 401：刷新 Token 并重试所有等待的请求
+  Future<void> _handleUnauthorized(List<_RequestCompleter> pending) async {
+    final newToken = await _refreshToken();
+
+    if (newToken != null) {
+      // 全部成功，重试所有请求
+      for (final completer in pending) {
+        completer.requestOptions.headers['Authorization'] = 'Bearer $newToken';
+        _dio.fetch(completer.requestOptions).then(
+          (response) => completer.resolve(response),
+          onError: (error) => completer.reject(error as DioException),
+        );
+      }
+    } else {
+      // 刷新失败，全部标记为 401
+      for (final completer in pending) {
+        completer.reject(
+          DioException(
+            requestOptions: completer.requestOptions,
+            response: Response(
+              requestOptions: completer.requestOptions,
+              statusCode: 401,
+            ),
+          ),
+        );
+      }
+    }
+  }
+}
+
+/// 辅助类：存储待重试的请求
+class _RequestCompleter {
+  final RequestOptions requestOptions;
+  final Completer<Response> completer;
+
+  _RequestCompleter(this.requestOptions) : completer = Completer<Response>();
+
+  void resolve(Response response) => completer.complete(response);
+  void reject(DioException error) => completer.completeError(error);
 }
 
 /// 认证拦截器 - 自动添加 Token
 class _AuthInterceptor extends Interceptor {
-  final FlutterSecureStorage _storage;
-  final Dio _dio;
+  final ApiClient _client;
 
-  _AuthInterceptor(this._storage, this._dio);
+  _AuthInterceptor(this._client);
 
   @override
   Future<void> onRequest(
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    // 读取 Token
-    final token = await _storage.read(key: AppConstants.keyAccessToken);
+    // 跳过 Token 刷新接口本身，避免死循环
+    if (options.path.endsWith('/auth/refresh')) {
+      return handler.next(options);
+    }
+
+    final storage = Get.find<FlutterSecureStorage>();
+    final token = await storage.read(key: AppConstants.keyAccessToken);
     if (token != null && token.isNotEmpty) {
       options.headers['Authorization'] = 'Bearer $token';
     }
@@ -215,36 +310,33 @@ class _AuthInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
-    // 如果是 401，尝试刷新 Token
-    if (err.response?.statusCode == 401) {
-      final refreshToken = await _storage.read(key: AppConstants.keyRefreshToken);
+    // 仅处理 401，且非刷新接口
+    if (err.response?.statusCode == 401 &&
+        !err.requestOptions.path.endsWith('/auth/refresh')) {
+      // 使用独立 Dio 实例调用刷新接口
+      final storage = Get.find<FlutterSecureStorage>();
+      final refreshToken = await storage.read(key: AppConstants.keyRefreshToken);
+
       if (refreshToken != null) {
-        try {
-          // 刷新 Token
-          final response = await _dio.post(
-            '/auth/refresh',
-            data: {'refresh_token': refreshToken},
-          );
+        final newToken = await _client._refreshToken();
 
-          if (response.statusCode == 200) {
-            final newToken = response.data['access_token'];
-            await _storage.write(
-              key: AppConstants.keyAccessToken,
-              value: newToken,
-            );
-
-            // 重试原请求
-            err.requestOptions.headers['Authorization'] = 'Bearer $newToken';
-            final retryResponse = await _dio.fetch(err.requestOptions);
+        if (newToken != null) {
+          // 更新 Token 并重试一次（不通过拦截器，避免循环）
+          err.requestOptions.headers['Authorization'] = 'Bearer $newToken';
+          try {
+            final retryResponse = await Dio().fetch(err.requestOptions);
             return handler.resolve(retryResponse);
+          } catch (e) {
+            return handler.next(err);
           }
-        } catch (_) {
-          // 刷新失败，清除 Token
-          await _storage.delete(key: AppConstants.keyAccessToken);
-          await _storage.delete(key: AppConstants.keyRefreshToken);
         }
       }
+
+      // 刷新失败或无 refreshToken，清除 Token
+      await storage.delete(key: AppConstants.keyAccessToken);
+      await storage.delete(key: AppConstants.keyRefreshToken);
     }
+
     handler.next(err);
   }
 }
@@ -270,15 +362,6 @@ class _LoggingInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
     _logger.e('[API] Error: ${err.message}');
-    handler.next(err);
-  }
-}
-
-/// 错误拦截器
-class _ErrorInterceptor extends Interceptor {
-  @override
-  void onError(DioException err, ErrorInterceptorHandler handler) {
-    // 统一错误处理
     handler.next(err);
   }
 }

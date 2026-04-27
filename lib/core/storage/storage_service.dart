@@ -3,16 +3,23 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// 本地存储服务
+import '../../config/constants.dart';
+
+/// 本地存储服务（GetX 生命周期管理）
 /// 敏感信息使用 FlutterSecureStorage
 /// 普通数据使用 SharedPreferences
-class StorageService {
+class StorageService extends GetxService {
   late final SharedPreferences _prefs;
-  final FlutterSecureStorage _secureStorage = Get.find<FlutterSecureStorage>();
+  late final FlutterSecureStorage _secureStorage;
 
-  /// 初始化
-  Future<void> init() async {
+  /// 初始化（代替构造函数）
+  Future<StorageService> init() async {
     _prefs = await SharedPreferences.getInstance();
+    _secureStorage = const FlutterSecureStorage(
+      aOptions: AndroidOptions(encryptedSharedPreferences: true),
+      iOptions: IOSOptions(accessibility: KeychainAccessibility.first_unlock),
+    );
+    return this;
   }
 
   // ===== 普通数据存储（SharedPreferences） =====
@@ -47,16 +54,20 @@ class StorageService {
     return _prefs.getBool(key);
   }
 
-  /// 存储 JSON 对象
+  /// 存储 JSON 对象（jsonEncode 保护）
   Future<bool> setJson(String key, Map<String, dynamic> value) {
     return _prefs.setString(key, jsonEncode(value));
   }
 
-  /// 获取 JSON 对象
+  /// 获取 JSON 对象（try-catch 保护，数据损坏不崩溃）
   Map<String, dynamic>? getJson(String key) {
     final str = _prefs.getString(key);
     if (str == null) return null;
-    return jsonDecode(str) as Map<String, dynamic>;
+    try {
+      return jsonDecode(str) as Map<String, dynamic>;
+    } catch (e) {
+      return null;
+    }
   }
 
   /// 存储字符串列表
@@ -88,41 +99,45 @@ class StorageService {
 
   /// 安全存储 Token
   Future<void> saveToken(String accessToken, String? refreshToken) async {
-    await _secureStorage.write(key: 'access_token', value: accessToken);
+    await _secureStorage.write(key: AppConstants.keyAccessToken, value: accessToken);
     if (refreshToken != null) {
-      await _secureStorage.write(key: 'refresh_token', value: refreshToken);
+      await _secureStorage.write(key: AppConstants.keyRefreshToken, value: refreshToken);
     }
   }
 
   /// 获取 Access Token
   Future<String?> getAccessToken() async {
-    return await _secureStorage.read(key: 'access_token');
+    return await _secureStorage.read(key: AppConstants.keyAccessToken);
   }
 
   /// 获取 Refresh Token
   Future<String?> getRefreshToken() async {
-    return await _secureStorage.read(key: 'refresh_token');
+    return await _secureStorage.read(key: AppConstants.keyRefreshToken);
   }
 
   /// 删除 Token
   Future<void> clearToken() async {
-    await _secureStorage.delete(key: 'access_token');
-    await _secureStorage.delete(key: 'refresh_token');
+    await _secureStorage.delete(key: AppConstants.keyAccessToken);
+    await _secureStorage.delete(key: AppConstants.keyRefreshToken);
   }
 
-  /// 安全存储用户信息
+  /// 安全存储用户信息（jsonEncode 保护）
   Future<void> saveUserInfo(Map<String, dynamic> userInfo) async {
     await _secureStorage.write(
-      key: 'user_info',
+      key: AppConstants.keyUserInfo,
       value: jsonEncode(userInfo),
     );
   }
 
-  /// 获取用户信息
+  /// 获取用户信息（try-catch 保护，数据损坏不崩溃）
   Future<Map<String, dynamic>?> getUserInfo() async {
-    final str = await _secureStorage.read(key: 'user_info');
+    final str = await _secureStorage.read(key: AppConstants.keyUserInfo);
     if (str == null) return null;
-    return jsonDecode(str) as Map<String, dynamic>;
+    try {
+      return jsonDecode(str) as Map<String, dynamic>;
+    } catch (e) {
+      return null;
+    }
   }
 
   /// 清除所有安全存储

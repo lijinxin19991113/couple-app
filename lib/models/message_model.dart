@@ -79,7 +79,7 @@ class MessageModel extends Equatable {
       readAt: json['readAt'] != null ? DateTime.tryParse(json['readAt']) : null,
       clientMsgId: json['clientMsgId'],
       createdAt: json['createdAt'] != null
-          ? DateTime.parse(json['createdAt'])
+          ? DateTime.tryParse(json['createdAt']) ?? DateTime.now()
           : DateTime.now(),
     );
   }

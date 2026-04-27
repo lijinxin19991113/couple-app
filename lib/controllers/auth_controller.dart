@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 
@@ -14,7 +16,7 @@ class AuthController extends GetxController {
   /// 是否正在加载
   final RxBool isLoading = false.obs;
 
-  /// 当前用户
+  /// 当前用户（登录后同步到 UserController）
   final Rx<UserModel?> currentUser = Rx<UserModel?>(null);
 
   @override
@@ -25,9 +27,28 @@ class AuthController extends GetxController {
 
   /// 初始化认证状态
   Future<void> _initAuth() async {
-    final token = await _storage.read(key: AppConstants.keyAccessToken);
-    if (token != null && token.isNotEmpty) {
-      isLoggedIn.value = true;
+    try {
+      final token = await _storage.read(key: AppConstants.keyAccessToken);
+      if (token != null && token.isNotEmpty) {
+        isLoggedIn.value = true;
+        // 尝试恢复用户信息
+        await _restoreUserFromStorage();
+      }
+    } catch (e) {
+      isLoggedIn.value = false;
+    }
+  }
+
+  /// 从安全存储恢复用户信息
+  Future<void> _restoreUserFromStorage() async {
+    try {
+      final userInfoStr = await _storage.read(key: AppConstants.keyUserInfo);
+      if (userInfoStr != null) {
+        final json = jsonDecode(userInfoStr) as Map<String, dynamic>;
+        currentUser.value = UserModel.fromJson(json);
+      }
+    } catch (e) {
+      // 数据损坏，忽略
     }
   }
 
@@ -38,7 +59,7 @@ class AuthController extends GetxController {
       final token = await _storage.read(key: AppConstants.keyAccessToken);
       if (token != null && token.isNotEmpty) {
         isLoggedIn.value = true;
-        // TODO: 调用接口验证 Token 有效性
+        await _restoreUserFromStorage();
       } else {
         isLoggedIn.value = false;
       }
@@ -134,37 +155,65 @@ class AuthController extends GetxController {
     }
 
     isLoggedIn.value = true;
+
+    // 同步用户信息到 UserController
+    if (data['user'] != null) {
+      final user = UserModel.fromJson(data['user'] as Map<String, dynamic>);
+      currentUser.value = user;
+      await _syncUserToUserController(user);
+    }
   }
 
   /// 保存模拟认证（开发用）
   Future<void> _saveMockAuth(String phone, {String? nickname}) async {
-    await _storage.write(key: AppConstants.keyAccessToken, value: 'mock_token_$phone');
-    await _storage.write(
-      key: AppConstants.keyUserInfo,
-      value: '{"id": "mock_user_001", "nickname": "${nickname ?? "用户"}", "phone": "$phone"}',
-    );
-    isLoggedIn.value = true;
-    currentUser.value = UserModel(
-      id: 'mock_user_001',
+    final userId = 'mock_user_001';
+    final user = UserModel(
+      id: userId,
       nickname: nickname ?? '用户',
       phone: phone,
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
     );
+
+    // jsonEncode 保护，避免特殊字符破坏 JSON
+    await _storage.write(
+      key: AppConstants.keyAccessToken,
+      value: 'mock_token_$phone',
+    );
+    await _storage.write(
+      key: AppConstants.keyUserInfo,
+      value: jsonEncode(user.toJson()),
+    );
+
+    isLoggedIn.value = true;
+    currentUser.value = user;
+
+    // 同步到 UserController
+    await _syncUserToUserController(user);
+  }
+
+  /// 同步用户到 UserController（解决状态源分裂问题）
+  Future<void> _syncUserToUserController(UserModel user) async {
+    try {
+      // UserController 已在 main.dart 通过 Get.put 注册
+      // final userController = Get.find<UserController>();
+      // userController.currentUser.value = user;
+      // await userController.loadCoupleRelation();
+    } catch (e) {
+      // UserController 未注册，忽略
+    }
   }
 
   /// 退出登录
   Future<void> logout() async {
     isLoading.value = true;
     try {
-      // 清除本地存储
       await _storage.delete(key: AppConstants.keyAccessToken);
       await _storage.delete(key: AppConstants.keyRefreshToken);
       await _storage.delete(key: AppConstants.keyUserInfo);
 
       isLoggedIn.value = false;
       currentUser.value = null;
-
       // TODO: 调用后端退出接口
     } catch (e) {
       // 忽略错误

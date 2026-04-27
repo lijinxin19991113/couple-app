@@ -94,7 +94,7 @@ class _HomeTab extends StatelessWidget {
             children: [
               // 问候卡片
               Obx(() {
-                final user = userController.currentUser;
+                final user = userController.currentUser.value;
                 return Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(20),
@@ -397,7 +397,7 @@ class _ProfileTab extends StatelessWidget {
         children: [
           // 用户信息
           Obx(() {
-            final user = userController.currentUser;
+            final user = userController.currentUser.value;
             return Container(
               padding: const EdgeInsets.all(20),
               child: Row(
@@ -406,7 +406,7 @@ class _ProfileTab extends StatelessWidget {
                     radius: 40,
                     backgroundColor: AppColors.primary,
                     child: Text(
-                      user?.nickname.substring(0, 1) ?? 'U',
+                      (user?.nickname.isNotEmpty == true) ? user!.nickname.substring(0, 1) : 'U',
                       style: const TextStyle(
                         fontSize: 24,
                         color: AppColors.white,

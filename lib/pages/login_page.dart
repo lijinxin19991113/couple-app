@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -18,9 +20,11 @@ class _LoginPageState extends State<LoginPage> {
   final _codeController = TextEditingController();
   bool _isLoading = false;
   int _countdown = 0;
+  Timer? _countdownTimer;
 
   @override
   void dispose() {
+    _countdownTimer?.cancel();
     _phoneController.dispose();
     _codeController.dispose();
     super.dispose();
@@ -34,11 +38,13 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
+    if (!mounted) return;
     setState(() => _isLoading = true);
 
     final authController = Get.find<AuthController>();
     final success = await authController.sendCode(phone);
 
+    if (!mounted) return;
     setState(() => _isLoading = false);
 
     if (success) {
@@ -49,15 +55,21 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  /// 倒计时
+  /// 倒计时（使用 Timer.periodic，dispose 时取消）
   void _startCountdown() {
+    _countdownTimer?.cancel();
     setState(() => _countdown = 60);
-    Future.doWhile(() async {
-      await Future.delayed(const Duration(seconds: 1));
-      if (mounted) {
-        setState(() => _countdown--);
+    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
       }
-      return _countdown > 0;
+      setState(() {
+        _countdown--;
+      });
+      if (_countdown <= 0) {
+        timer.cancel();
+      }
     });
   }
 
@@ -75,11 +87,13 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
+    if (!mounted) return;
     setState(() => _isLoading = true);
 
     final authController = Get.find<AuthController>();
     final success = await authController.loginWithCode(phone, code);
 
+    if (!mounted) return;
     setState(() => _isLoading = false);
 
     if (success) {
@@ -104,7 +118,7 @@ class _LoginPageState extends State<LoginPage> {
                 child: Container(
                   width: 100,
                   height: 100,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     gradient: AppColors.primaryGradient,
                     shape: BoxShape.circle,
                   ),
