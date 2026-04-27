@@ -72,7 +72,9 @@ class UserModel extends Equatable {
       nickname: json['nickname'] ?? '未设置昵称',
       avatar: json['avatar'],
       gender: json['gender'],
-      birthday: json['birthday'] != null ? DateTime.tryParse(json['birthday']) : null,
+      birthday: (json['birthday'] is String)
+          ? DateTime.tryParse(json['birthday'])
+          : null,
       signature: json['signature'],
       phone: json['phone'],
       email: json['email'],
@@ -80,13 +82,13 @@ class UserModel extends Equatable {
       jpushRegistrationId: json['jpushRegistrationId'],
       locationPermission: json['locationPermission'] ?? false,
       notificationEnabled: json['notificationEnabled'] ?? true,
-      lastActiveAt: json['lastActiveAt'] != null
+      lastActiveAt: (json['lastActiveAt'] is String)
           ? DateTime.tryParse(json['lastActiveAt'])
           : null,
-      createdAt: json['createdAt'] != null
+      createdAt: (json['createdAt'] is String)
           ? DateTime.tryParse(json['createdAt']) ?? DateTime.now()
           : DateTime.now(),
-      updatedAt: json['updatedAt'] != null
+      updatedAt: (json['updatedAt'] is String)
           ? DateTime.tryParse(json['updatedAt']) ?? DateTime.now()
           : DateTime.now(),
     );

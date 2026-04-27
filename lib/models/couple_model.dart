@@ -68,21 +68,21 @@ class CoupleModel extends Equatable {
       relationCode: json['relationCode'] ?? '',
       userA: json['userA'] != null ? UserModel.fromJson(json['userA']) : null,
       userB: json['userB'] != null ? UserModel.fromJson(json['userB']) : null,
-      anniversaryDate: json['anniversaryDate'] != null
+      anniversaryDate: (json['anniversaryDate'] is String)
           ? DateTime.tryParse(json['anniversaryDate'])
           : null,
       status: _parseStatus(json['status']),
       backgroundImage: json['backgroundImage'],
       themeConfig: json['themeConfig'],
       coupleName: json['coupleName'],
-      lastInteractionAt: json['lastInteractionAt'] != null
+      lastInteractionAt: (json['lastInteractionAt'] is String)
           ? DateTime.tryParse(json['lastInteractionAt'])
           : null,
       createdBy: json['createdBy'],
-      createdAt: json['createdAt'] != null
+      createdAt: (json['createdAt'] is String)
           ? DateTime.tryParse(json['createdAt']) ?? DateTime.now()
           : DateTime.now(),
-      updatedAt: json['updatedAt'] != null
+      updatedAt: (json['updatedAt'] is String)
           ? DateTime.tryParse(json['updatedAt']) ?? DateTime.now()
           : DateTime.now(),
     );

@@ -76,9 +76,11 @@ class MessageModel extends Equatable {
       thumbnailUrl: json['thumbnailUrl'],
       extraData: json['extraData'],
       status: _parseStatus(json['sendStatus']),
-      readAt: json['readAt'] != null ? DateTime.tryParse(json['readAt']) : null,
+      readAt: (json['readAt'] is String)
+          ? DateTime.tryParse(json['readAt'])
+          : null,
       clientMsgId: json['clientMsgId'],
-      createdAt: json['createdAt'] != null
+      createdAt: (json['createdAt'] is String)
           ? DateTime.tryParse(json['createdAt']) ?? DateTime.now()
           : DateTime.now(),
     );

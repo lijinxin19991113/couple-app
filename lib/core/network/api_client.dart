@@ -27,8 +27,8 @@ class ApiClient {
   /// Token 刷新互斥锁，防止并发刷新
   bool _isRefreshing = false;
 
-  /// 等待刷新的请求队列
-  final List<_RequestCompleter> _pendingRequests = [];
+  /// 刷新成功后等待重试的请求队列（每个请求自己的 Completer）
+  final List<_QueuedRequest> _queuedRequests = [];
 
   ApiClient(this._storage) {
     _dio = Dio(
@@ -208,80 +208,100 @@ class ApiClient {
     return null;
   }
 
-  /// Token 刷新（互斥锁 + 重试上限）
+  /// Token 刷新（互斥锁 + 队列等待）
+  ///
+  /// 并发 401 处理流程：
+  /// - 第一个 401：加锁，发起刷新请求
+  /// - 后续 401（在刷新中）：加入 _queuedRequests 队列，等待刷新完成
+  /// - 刷新成功：用新 Token 重试所有队列请求
+  /// - 刷新失败：所有队列请求均以 401 拒绝，并清除本地 Token
   Future<String?> _refreshToken() async {
-    if (_isRefreshing) return null;
+    // 如果已经在刷新中，加入队列等待
+    if (_isRefreshing) {
+      return _waitForRefresh();
+    }
 
     _isRefreshing = true;
 
     try {
       final refreshToken = await _storage.read(key: AppConstants.keyRefreshToken);
       if (refreshToken == null) {
+        _notifyAll(null); // 无 refreshToken，通知所有等待的请求失败
         return null;
       }
 
-      // 使用独立 Dio 实例，避免拦截器递归
       final response = await _refreshDio.post(
         '${AppConstants.apiBaseUrl}/auth/refresh',
         data: {'refresh_token': refreshToken},
       );
 
+      String? newToken;
+
       if (response.statusCode == 200 && response.data != null) {
-        final newToken = response.data['access_token'] as String?;
+        newToken = response.data['access_token'] as String?;
         if (newToken != null) {
           await _storage.write(key: AppConstants.keyAccessToken, value: newToken);
-          return newToken;
         }
       }
 
-      return null;
+      _notifyAll(newToken); // 通知所有等待的请求
+      return newToken;
     } catch (e) {
       _logger.e('Token refresh failed: $e');
+      _notifyAll(null); // 刷新异常，通知所有等待的请求失败
       return null;
     } finally {
       _isRefreshing = false;
     }
   }
 
-  /// 处理 401：刷新 Token 并重试所有等待的请求
-  Future<void> _handleUnauthorized(List<_RequestCompleter> pending) async {
+  /// 刷新进行中时加入队列，等待刷新完成后被通知
+  Future<String?> _waitForRefresh() async {
+    final completer = Completer<String?>();
+    _queuedRequests.add(_QueuedRequest(completer: completer));
+    return completer.future;
+  }
+
+  /// 刷新完成后，通知所有等待的请求
+  void _notifyAll(String? newToken) {
+    for (final req in _queuedRequests) {
+      req.complete(newToken);
+    }
+    _queuedRequests.clear();
+  }
+
+  /// 处理单个 401 请求：刷新 Token 并重试该请求
+  /// 返回重试后的 Response，刷新失败返回 null
+  Future<Response?> _handle401(RequestOptions options) async {
     final newToken = await _refreshToken();
 
     if (newToken != null) {
-      // 全部成功，重试所有请求
-      for (final completer in pending) {
-        completer.requestOptions.headers['Authorization'] = 'Bearer $newToken';
-        _dio.fetch(completer.requestOptions).then(
-          (response) => completer.resolve(response),
-          onError: (error) => completer.reject(error as DioException),
-        );
+      // 刷新成功：用新 Token 重试该请求
+      options.headers['Authorization'] = 'Bearer $newToken';
+      try {
+        return await _dio.fetch(options);
+      } catch (e) {
+        // 重试失败，返回 null，由调用方走原始错误流程
+        return null;
       }
     } else {
-      // 刷新失败，全部标记为 401
-      for (final completer in pending) {
-        completer.reject(
-          DioException(
-            requestOptions: completer.requestOptions,
-            response: Response(
-              requestOptions: completer.requestOptions,
-              statusCode: 401,
-            ),
-          ),
-        );
-      }
+      // 刷新失败：清除本地 Token
+      await _storage.delete(key: AppConstants.keyAccessToken);
+      await _storage.delete(key: AppConstants.keyRefreshToken);
+      return null;
     }
   }
 }
 
-/// 辅助类：存储待重试的请求
-class _RequestCompleter {
-  final RequestOptions requestOptions;
-  final Completer<Response> completer;
+/// 待重试的请求封装
+class _QueuedRequest {
+  final Completer<String?> completer;
 
-  _RequestCompleter(this.requestOptions) : completer = Completer<Response>();
+  _QueuedRequest({required this.completer});
 
-  void resolve(Response response) => completer.complete(response);
-  void reject(DioException error) => completer.completeError(error);
+  void complete(String? token) {
+    if (!completer.isCompleted) completer.complete(token);
+  }
 }
 
 /// 认证拦截器 - 自动添加 Token
@@ -313,31 +333,18 @@ class _AuthInterceptor extends Interceptor {
     // 仅处理 401，且非刷新接口
     if (err.response?.statusCode == 401 &&
         !err.requestOptions.path.endsWith('/auth/refresh')) {
-      // 使用独立 Dio 实例调用刷新接口
-      final storage = Get.find<FlutterSecureStorage>();
-      final refreshToken = await storage.read(key: AppConstants.keyRefreshToken);
-
-      if (refreshToken != null) {
-        final newToken = await _client._refreshToken();
-
-        if (newToken != null) {
-          // 更新 Token 并重试一次（不通过拦截器，避免循环）
-          err.requestOptions.headers['Authorization'] = 'Bearer $newToken';
-          try {
-            final retryResponse = await Dio().fetch(err.requestOptions);
-            return handler.resolve(retryResponse);
-          } catch (e) {
-            return handler.next(err);
-          }
-        }
+      // 刷新 Token 并重试
+      final retryResponse = await _client._handle401(err.requestOptions);
+      if (retryResponse != null) {
+        // 刷新成功，返回重试后的响应
+        handler.resolve(retryResponse);
+      } else {
+        // 刷新失败，沿用原始 401 错误
+        handler.next(err);
       }
-
-      // 刷新失败或无 refreshToken，清除 Token
-      await storage.delete(key: AppConstants.keyAccessToken);
-      await storage.delete(key: AppConstants.keyRefreshToken);
+    } else {
+      handler.next(err);
     }
-
-    handler.next(err);
   }
 }
 
@@ -360,7 +367,7 @@ class _LoggingInterceptor extends Interceptor {
   }
 
   @override
-  void onError(DioException err, ErrorInterceptorHandler handler) {
+  void onError(DioException err, ResponseInterceptorHandler handler) {
     _logger.e('[API] Error: ${err.message}');
     handler.next(err);
   }
