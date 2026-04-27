@@ -6,6 +6,7 @@ import '../controllers/anniversary_controller.dart';
 import '../models/anniversary_model.dart';
 import '../services/anniversary_service.dart';
 import 'anniversary_form_page.dart';
+import 'anniversary_reminder_settings_page.dart';
 
 /// 纪念日列表页
 class AnniversaryPage extends StatefulWidget {
@@ -34,8 +35,13 @@ class _AnniversaryPageState extends State<AnniversaryPage> {
         title: const Text('纪念日'),
         actions: [
           IconButton(
+            icon: const Icon(Icons.notifications_outlined),
+            onPressed: _navigateToReminderSettings,
+            tooltip: '提醒设置',
+          ),
+          IconButton(
             icon: const Icon(Icons.add),
-            onPressed: () => _navigateToForm(),
+            onPressed: _navigateToForm,
           ),
         ],
       ),
@@ -246,6 +252,14 @@ class _AnniversaryPageState extends State<AnniversaryPage> {
   void _navigateToForm({AnniversaryModel? anniversary}) {
     Get.to(
       () => AnniversaryFormPage(anniversary: anniversary),
+      transition: Transition.rightToLeft,
+    );
+  }
+
+  /// 跳转到提醒设置页
+  void _navigateToReminderSettings() {
+    Get.to(
+      () => const AnniversaryReminderSettingsPage(),
       transition: Transition.rightToLeft,
     );
   }

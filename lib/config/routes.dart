@@ -15,6 +15,7 @@ import '../pages/photo_view_page.dart';
 import '../pages/upload_photo_page.dart';
 import '../pages/anniversary_page.dart';
 import '../pages/anniversary_form_page.dart';
+import '../pages/anniversary_reminder_settings_page.dart';
 import '../pages/mood_page.dart';
 import '../pages/mood_checkin_page.dart';
 import '../pages/location_share_page.dart';
@@ -42,6 +43,7 @@ class AppRoutes {
   static const String album = '/album';
   static const String anniversary = '/anniversary';
   static const String anniversaryForm = '/anniversary-form';
+  static const String anniversaryReminderSettings = '/anniversary-reminder-settings';
   static const String mood = '/mood';
   static const String moodCheckin = '/mood-checkin';
   static const String locationShare = '/location-share';
@@ -120,6 +122,11 @@ class AppRoutes {
     GetPage(
       name: anniversaryForm,
       page: () => const AnniversaryFormPage(),
+      transition: Transition.rightToLeft,
+    ),
+    GetPage(
+      name: anniversaryReminderSettings,
+      page: () => const AnniversaryReminderSettingsPage(),
       transition: Transition.rightToLeft,
     ),
     GetPage(
