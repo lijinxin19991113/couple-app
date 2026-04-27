@@ -23,6 +23,9 @@ import '../pages/location_history_page.dart';
 import '../pages/diary_page.dart';
 import '../pages/diary_write_page.dart';
 import '../pages/diary_detail_page.dart';
+import '../pages/wish_list_page.dart';
+import '../pages/wish_form_page.dart';
+import '../pages/wish_detail_page.dart';
 
 /// 路由配置
 class AppRoutes {
@@ -51,6 +54,9 @@ class AppRoutes {
   static const String diary = '/diary';
   static const String diaryWrite = '/diary-write';
   static const String diaryDetail = '/diary-detail';
+  static const String wishList = '/wish-list';
+  static const String wishForm = '/wish-form';
+  static const String wishDetail = '/wish-detail';
 
   // ===== 路由页面列表 =====
   static final List<GetPage> pages = [
@@ -162,6 +168,21 @@ class AppRoutes {
     GetPage(
       name: diaryDetail,
       page: () => const DiaryDetailPage(),
+      transition: Transition.rightToLeft,
+    ),
+    GetPage(
+      name: wishList,
+      page: () => const WishListPage(),
+      transition: Transition.rightToLeft,
+    ),
+    GetPage(
+      name: wishForm,
+      page: () => const WishFormPage(),
+      transition: Transition.rightToLeft,
+    ),
+    GetPage(
+      name: wishDetail,
+      page: () => const WishDetailPage(),
       transition: Transition.rightToLeft,
     ),
   ];
