@@ -13,6 +13,7 @@ class AppConstants {
   static const String keyUserInfo = 'user_info';
   static const String keyCoupleId = 'couple_id';
   static const String keyLastLoginTime = 'last_login_time';
+  static const String keyAnniversaryList = 'anniversary_list';
 
   // ===== API 配置 =====
   /// LeanCloud App ID
