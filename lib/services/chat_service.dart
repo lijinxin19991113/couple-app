@@ -44,9 +44,9 @@ class ChatService {
       relationId: relationId,
       senderId: senderId,
       receiverId: receiverId,
-      messageType: MessageType.text,
+      messageType: ChatMessageType.text,
       content: content,
-      sendStatus: SendStatus.sending,
+      sendStatus: ChatSendStatus.sending,
       createdAt: DateTime.now(),
     );
 
@@ -57,7 +57,7 @@ class ChatService {
     // 模拟发送成功
     await Future.delayed(const Duration(milliseconds: 300));
 
-    final sentMessage = message.copyWith(sendStatus: SendStatus.sent);
+    final sentMessage = message.copyWith(sendStatus: ChatSendStatus.sent);
     _updateMessage(relationId, clientMsgId, sentMessage);
 
     // 通知新消息
@@ -81,10 +81,10 @@ class ChatService {
       relationId: relationId,
       senderId: senderId,
       receiverId: receiverId,
-      messageType: MessageType.image,
+      messageType: ChatMessageType.image,
       content: caption,
       mediaUrl: localFilePath, // 模拟上传后返回 URL
-      sendStatus: SendStatus.sending,
+      sendStatus: ChatSendStatus.sending,
       createdAt: DateTime.now(),
     );
 
@@ -95,7 +95,7 @@ class ChatService {
     // 模拟上传延迟
     await Future.delayed(const Duration(seconds: 1));
 
-    final sentMessage = message.copyWith(sendStatus: SendStatus.sent);
+    final sentMessage = message.copyWith(sendStatus: ChatSendStatus.sent);
     _updateMessage(relationId, clientMsgId, sentMessage);
 
     // 通知新消息
@@ -116,9 +116,9 @@ class ChatService {
           messages[i].clientMsgId == lastReadMsgId) {
         // 标记此消息及之前的所有消息为已读
         for (var j = 0; j <= i; j++) {
-          if (messages[j].sendStatus != SendStatus.read) {
+          if (messages[j].sendStatus != ChatSendStatus.read) {
             messages[j] = messages[j].copyWith(
-              sendStatus: SendStatus.read,
+              sendStatus: ChatSendStatus.read,
               readAt: DateTime.now(),
             );
           }
@@ -133,7 +133,7 @@ class ChatService {
     await Future.delayed(const Duration(milliseconds: 100));
 
     final messages = _mockMessages[relationId] ?? [];
-    return messages.where((m) => m.sendStatus != SendStatus.read).length;
+    return messages.where((m) => m.sendStatus != ChatSendStatus.read).length;
   }
 
   /// 监听新消息
@@ -180,9 +180,9 @@ class ChatService {
       relationId: relationId,
       senderId: senderId,
       receiverId: receiverId,
-      messageType: MessageType.text,
+      messageType: ChatMessageType.text,
       content: content,
-      sendStatus: SendStatus.sent,
+      sendStatus: ChatSendStatus.sent,
       createdAt: DateTime.now(),
     );
 

@@ -1,86 +1,53 @@
 import 'package:equatable/equatable.dart';
 
-/// 消息类型
-enum MessageType {
+/// 聊天消息类型
+enum ChatMessageType {
   text,
   image,
   emoji,
   system;
 
-  static MessageType fromString(String? value) {
-    return MessageType.values.firstWhere(
-      (e) => e.name == value,
-      orElse: () => MessageType.text,
+  static ChatMessageType fromString(String? value) {
+    return ChatMessageType.values.firstWhere(
+      (item) => item.name == value,
+      orElse: () => ChatMessageType.text,
     );
   }
 }
 
-/// 发送状态
-enum SendStatus {
+/// 消息发送状态
+enum ChatSendStatus {
   sending,
   sent,
   failed,
   read;
 
-  static SendStatus fromString(String? value) {
-    return SendStatus.values.firstWhere(
-      (e) => e.name == value,
-      orElse: () => SendStatus.sending,
+  static ChatSendStatus fromString(String? value) {
+    return ChatSendStatus.values.firstWhere(
+      (item) => item.name == value,
+      orElse: () => ChatSendStatus.sending,
     );
   }
 }
 
 /// 聊天消息模型
 class ChatMessage extends Equatable {
-  /// 消息 ID
   final String objectId;
-
-  /// 客户端消息 ID（用于去重和关联）
   final String clientMsgId;
-
-  /// 关系 ID
   final String relationId;
-
-  /// 发送者 ID
   final String senderId;
-
-  /// 接收者 ID
   final String receiverId;
-
-  /// 消息类型
-  final MessageType messageType;
-
-  /// 消息内容（文字消息时使用）
+  final ChatMessageType messageType;
   final String? content;
-
-  /// 媒体 URL（图片/语音消息时使用）
   final String? mediaUrl;
-
-  /// 媒体缩略图 URL
   final String? mediaThumbnailUrl;
-
-  /// 媒体宽度
   final int? mediaWidth;
-
-  /// 媒体高度
   final int? mediaHeight;
-
-  /// 位置地址
   final String? locationAddress;
-
-  /// 位置纬度
   final double? locationLat;
-
-  /// 位置经度
   final double? locationLng;
-
-  /// 发送状态
-  final SendStatus sendStatus;
-
-  /// 已读时间
+  final ChatSendStatus sendStatus;
   final DateTime? readAt;
-
-  /// 创建时间
   final DateTime createdAt;
 
   const ChatMessage({
@@ -103,41 +70,41 @@ class ChatMessage extends Equatable {
     required this.createdAt,
   });
 
-  /// 从 JSON 创建
   factory ChatMessage.fromJson(Map<String, dynamic> json) {
-    final messageTypeStr = json['messageType'] as String?;
-    final sendStatusStr = json['sendStatus'] as String?;
-
     return ChatMessage(
-      objectId: json['objectId'] ?? json['id'] ?? '',
-      clientMsgId: json['clientMsgId'] ?? '',
-      relationId: json['relationId'] ?? '',
-      senderId: json['senderId'] ?? '',
-      receiverId: json['receiverId'] ?? '',
-      messageType: MessageType.fromString(messageTypeStr),
-      content: json['content'] as String?,
-      mediaUrl: json['mediaUrl'] as String?,
-      mediaThumbnailUrl: json['mediaThumbnailUrl'] as String?,
+      objectId: (json['objectId'] ?? json['id'] ?? '').toString(),
+      clientMsgId: (json['clientMsgId'] ?? '').toString(),
+      relationId: (json['relationId'] ?? '').toString(),
+      senderId: (json['senderId'] ?? '').toString(),
+      receiverId: (json['receiverId'] ?? '').toString(),
+      messageType: ChatMessageType.fromString(json['messageType']?.toString()),
+      content: json['content']?.toString(),
+      mediaUrl: json['mediaUrl']?.toString(),
+      mediaThumbnailUrl: json['mediaThumbnailUrl']?.toString(),
       mediaWidth: (json['mediaWidth'] as num?)?.toInt(),
       mediaHeight: (json['mediaHeight'] as num?)?.toInt(),
-      locationAddress: json['locationAddress'] as String?,
+      locationAddress: json['locationAddress']?.toString(),
       locationLat: (json['locationLat'] as num?)?.toDouble(),
       locationLng: (json['locationLng'] as num?)?.toDouble(),
-      sendStatus: SendStatus.fromString(sendStatusStr),
+      sendStatus: ChatSendStatus.fromString(json['sendStatus']?.toString()),
       readAt: _parseDateTime(json['readAt']),
       createdAt: _parseDateTime(json['createdAt']) ?? DateTime.now(),
     );
   }
 
-  /// 安全解析 DateTime
   static DateTime? _parseDateTime(dynamic value) {
-    if (value == null) return null;
-    if (value is DateTime) return value;
-    if (value is String) return DateTime.tryParse(value);
+    if (value == null) {
+      return null;
+    }
+    if (value is DateTime) {
+      return value;
+    }
+    if (value is String) {
+      return DateTime.tryParse(value);
+    }
     return null;
   }
 
-  /// 转为 JSON
   Map<String, dynamic> toJson() {
     return {
       'objectId': objectId,
@@ -160,14 +127,13 @@ class ChatMessage extends Equatable {
     };
   }
 
-  /// 复制并修改
   ChatMessage copyWith({
     String? objectId,
     String? clientMsgId,
     String? relationId,
     String? senderId,
     String? receiverId,
-    MessageType? messageType,
+    ChatMessageType? messageType,
     String? content,
     String? mediaUrl,
     String? mediaThumbnailUrl,
@@ -176,7 +142,7 @@ class ChatMessage extends Equatable {
     String? locationAddress,
     double? locationLat,
     double? locationLng,
-    SendStatus? sendStatus,
+    ChatSendStatus? sendStatus,
     DateTime? readAt,
     DateTime? createdAt,
   }) {

@@ -231,17 +231,17 @@ class ChatController extends GetxController {
     final index = messages.indexWhere((m) => m.clientMsgId == message.clientMsgId);
     if (index == -1) return;
 
-    messages[index] = message.copyWith(sendStatus: SendStatus.sending);
+    messages[index] = message.copyWith(sendStatus: ChatSendStatus.sending);
 
     try {
-      if (message.messageType == MessageType.text) {
+      if (message.messageType == ChatMessageType.text) {
         await sendTextMessage(message.content ?? '');
-      } else if (message.messageType == MessageType.image) {
+      } else if (message.messageType == ChatMessageType.image) {
         await sendImageMessage(message.mediaUrl ?? '', caption: message.content);
       }
     } catch (e) {
       if (_isMounted) {
-        messages[index] = message.copyWith(sendStatus: SendStatus.failed);
+        messages[index] = message.copyWith(sendStatus: ChatSendStatus.failed);
       }
     }
   }

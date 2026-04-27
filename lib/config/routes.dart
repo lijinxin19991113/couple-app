@@ -8,6 +8,8 @@ import '../pages/home_page.dart';
 import '../pages/couple_bind_page.dart';
 import '../pages/profile_edit_page.dart';
 import '../pages/couple_profile_page.dart';
+import '../pages/chat_list_page.dart';
+import '../pages/chat_page.dart';
 
 /// 路由配置
 class AppRoutes {
@@ -21,6 +23,8 @@ class AppRoutes {
   static const String coupleBind = '/couple-bind';
   static const String profileEdit = '/profile-edit';
   static const String coupleProfile = '/couple-profile';
+  static const String chatList = '/chat-list';
+  static const String chat = '/chat';
 
   // ===== 路由页面列表 =====
   static final List<GetPage> pages = [
@@ -57,6 +61,16 @@ class AppRoutes {
     GetPage(
       name: coupleProfile,
       page: () => const CoupleProfilePage(),
+      transition: Transition.rightToLeft,
+    ),
+    GetPage(
+      name: chatList,
+      page: () => const ChatListPage(),
+      transition: Transition.rightToLeft,
+    ),
+    GetPage(
+      name: chat,
+      page: () => const ChatPage(),
       transition: Transition.rightToLeft,
     ),
   ];
