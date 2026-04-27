@@ -5,6 +5,7 @@ import '../config/colors.dart';
 import '../config/routes.dart';
 import '../controllers/user_controller.dart';
 import '../controllers/auth_controller.dart';
+import 'chat_list_page.dart';
 import 'album_page.dart';
 
 /// 主页
@@ -247,7 +248,7 @@ class _HomeTab extends StatelessWidget {
                       icon: Icons.calendar_today,
                       title: '纪念日',
                       color: AppColors.orange,
-                      onTap: () {},
+                      onTap: () => Get.toNamed(AppRoutes.anniversary),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -256,7 +257,7 @@ class _HomeTab extends StatelessWidget {
                       icon: Icons.mood,
                       title: '心情打卡',
                       color: AppColors.green,
-                      onTap: () {},
+                      onTap: () => Get.toNamed(AppRoutes.mood),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -362,19 +363,7 @@ class _ChatTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('聊天')),
-      body: const Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.chat_bubble_outline, size: 64, color: AppColors.gray3),
-            SizedBox(height: 16),
-            Text('聊天功能开发中...', style: TextStyle(color: AppColors.gray3)),
-          ],
-        ),
-      ),
-    );
+    return const ChatListPage();
   }
 }
 

@@ -13,6 +13,10 @@ import '../pages/chat_page.dart';
 import '../pages/album_page.dart';
 import '../pages/photo_view_page.dart';
 import '../pages/upload_photo_page.dart';
+import '../pages/anniversary_page.dart';
+import '../pages/anniversary_form_page.dart';
+import '../pages/mood_page.dart';
+import '../pages/mood_checkin_page.dart';
 
 /// 路由配置
 class AppRoutes {
@@ -30,6 +34,11 @@ class AppRoutes {
   static const String chat = '/chat';
   static const String photoView = '/photo-view';
   static const String uploadPhoto = '/upload-photo';
+  static const String album = '/album';
+  static const String anniversary = '/anniversary';
+  static const String anniversaryForm = '/anniversary-form';
+  static const String mood = '/mood';
+  static const String moodCheckin = '/mood-checkin';
 
   // ===== 路由页面列表 =====
   static final List<GetPage> pages = [
@@ -86,6 +95,31 @@ class AppRoutes {
     GetPage(
       name: uploadPhoto,
       page: () => const UploadPhotoPage(),
+      transition: Transition.rightToLeft,
+    ),
+    GetPage(
+      name: album,
+      page: () => const AlbumPage(),
+      transition: Transition.rightToLeft,
+    ),
+    GetPage(
+      name: anniversary,
+      page: () => const AnniversaryPage(),
+      transition: Transition.rightToLeft,
+    ),
+    GetPage(
+      name: anniversaryForm,
+      page: () => const AnniversaryFormPage(),
+      transition: Transition.rightToLeft,
+    ),
+    GetPage(
+      name: mood,
+      page: () => const MoodPage(),
+      transition: Transition.rightToLeft,
+    ),
+    GetPage(
+      name: moodCheckin,
+      page: () => const MoodCheckinPage(),
       transition: Transition.rightToLeft,
     ),
   ];
