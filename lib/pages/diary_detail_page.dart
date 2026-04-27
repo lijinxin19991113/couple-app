@@ -167,6 +167,7 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
       AppRoutes.diaryWrite,
       arguments: {'entry': _entry},
     )?.then((_) {
+      if (!mounted) return;
       // 刷新数据
       final updated = _diaryController.diaryEntries
           .firstWhereOrNull((e) => e.objectId == _entry.objectId);
@@ -203,7 +204,15 @@ class _DiaryDetailPageState extends State<DiaryDetailPage> {
   }
 
   void _doDelete() async {
-    await _diaryController.deleteEntry(_entry.objectId);
+    try {
+      await _diaryController.deleteEntry(_entry.objectId);
+    } catch (e) {
+      if (mounted) {
+        Get.snackbar('错误', '删除失败，请稍后重试');
+      }
+      return;
+    }
+    if (!mounted) return;
     Get.back();
   }
 }

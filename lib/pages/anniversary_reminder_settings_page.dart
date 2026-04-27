@@ -21,8 +21,12 @@ class _AnniversaryReminderSettingsPageState
   @override
   void initState() {
     super.initState();
-    // 注册控制器
-    _controller = Get.put(AnniversaryReminderController());
+    // 复用单例控制器，避免重复注册
+    if (Get.isRegistered<AnniversaryReminderController>()) {
+      _controller = Get.find<AnniversaryReminderController>();
+    } else {
+      _controller = Get.put(AnniversaryReminderController.instance);
+    }
   }
 
   @override

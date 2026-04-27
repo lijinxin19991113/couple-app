@@ -423,6 +423,7 @@ class _LocationHistoryPageState extends State<LocationHistoryPage> {
       },
     );
 
+    if (!mounted) return;
     if (picked != null && picked != _selectedDate) {
       setState(() {
         _selectedDate = picked;

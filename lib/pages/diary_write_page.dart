@@ -193,7 +193,7 @@ class _DiaryWritePageState extends State<DiaryWritePage> {
     );
   }
 
-  void _saveDiary() async {
+  Future<void> _saveDiary() async {
     final title = _titleController.text.trim();
     final content = _contentController.text.trim();
     final location = _locationController.text.trim();
@@ -208,30 +208,38 @@ class _DiaryWritePageState extends State<DiaryWritePage> {
       return;
     }
 
-    if (_isEditing) {
-      await _diaryController.updateEntry(
-        id: _editingEntry!.objectId,
-        title: title,
-        content: content,
-        imageUrls: _imageUrls,
-        moodType: _selectedMood,
-        weather: _selectedWeather,
-        locationText: location.isEmpty ? null : location,
-        isPrivate: _isPrivate,
-      );
-    } else {
-      await _diaryController.createEntry(
-        title: title,
-        content: content,
-        imageUrls: _imageUrls,
-        moodType: _selectedMood,
-        weather: _selectedWeather,
-        locationText: location.isEmpty ? null : location,
-        isPrivate: _isPrivate,
-        recordDate: _recordDate,
-      );
+    try {
+      if (_isEditing) {
+        await _diaryController.updateEntry(
+          id: _editingEntry!.objectId,
+          title: title,
+          content: content,
+          imageUrls: _imageUrls,
+          moodType: _selectedMood,
+          weather: _selectedWeather,
+          locationText: location.isEmpty ? null : location,
+          isPrivate: _isPrivate,
+        );
+      } else {
+        await _diaryController.createEntry(
+          title: title,
+          content: content,
+          imageUrls: _imageUrls,
+          moodType: _selectedMood,
+          weather: _selectedWeather,
+          locationText: location.isEmpty ? null : location,
+          isPrivate: _isPrivate,
+          recordDate: _recordDate,
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        Get.snackbar('错误', '保存日记失败，请稍后重试');
+      }
+      return;
     }
 
+    if (!mounted) return;
     Get.back();
   }
 }

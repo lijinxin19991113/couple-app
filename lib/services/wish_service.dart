@@ -131,7 +131,9 @@ class WishService {
       priority: updates['priority'] as WishPriority?,
       status: updates['status'] as WishStatus?,
       targetDate: updates['targetDate'] as DateTime?,
+      fulfilledAt: updates['fulfilledAt'] as DateTime?,
       clearTargetDate: updates['clearTargetDate'] as bool? ?? false,
+      clearFulfilledAt: updates['clearFulfilledAt'] as bool? ?? false,
     );
     _mockData[index] = updated;
     return updated;
@@ -149,6 +151,7 @@ class WishService {
   Future<WishItem?> abandonWishItem(String id) async {
     return updateWishItem(id, {
       'status': WishStatus.abandoned,
+      'clearFulfilledAt': true,
     });
   }
 
@@ -172,6 +175,8 @@ class WishService {
   /// 删除愿望
   Future<bool> deleteWishItem(String id) async {
     await Future.delayed(const Duration(milliseconds: 200));
-    return _mockData.removeWhere((item) => item.objectId == id) != null;
+    final lengthBefore = _mockData.length;
+    _mockData.removeWhere((item) => item.objectId == id);
+    return _mockData.length < lengthBefore;
   }
 }

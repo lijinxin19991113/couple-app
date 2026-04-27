@@ -243,37 +243,46 @@ class _WishFormPageState extends State<WishFormPage> {
       firstDate: now,
       lastDate: now.add(const Duration(days: 365 * 5)),
     );
+    if (!mounted) return;
     if (picked != null) {
       setState(() => _targetDate = picked);
     }
   }
 
-  void _save() {
+  Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
 
     final title = _titleController.text.trim();
     final description = _descController.text.trim();
 
-    if (isEditing) {
-      _controller.updateWish(
-        id: widget.wishItem!.objectId,
-        title: title,
-        description: description.isEmpty ? null : description,
-        category: _selectedCategory,
-        priority: _selectedPriority,
-        targetDate: _targetDate,
-        clearTargetDate: _targetDate == null && widget.wishItem!.targetDate != null,
-      );
-    } else {
-      _controller.addWish(
-        title: title,
-        description: description.isEmpty ? null : description,
-        category: _selectedCategory,
-        priority: _selectedPriority,
-        targetDate: _targetDate,
-      );
+    try {
+      if (isEditing) {
+        await _controller.updateWish(
+          id: widget.wishItem!.objectId,
+          title: title,
+          description: description.isEmpty ? null : description,
+          category: _selectedCategory,
+          priority: _selectedPriority,
+          targetDate: _targetDate,
+          clearTargetDate: _targetDate == null && widget.wishItem!.targetDate != null,
+        );
+      } else {
+        await _controller.addWish(
+          title: title,
+          description: description.isEmpty ? null : description,
+          category: _selectedCategory,
+          priority: _selectedPriority,
+          targetDate: _targetDate,
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        Get.snackbar('错误', '保存愿望失败，请稍后重试');
+      }
+      return;
     }
 
+    if (!mounted) return;
     Get.back();
   }
 }

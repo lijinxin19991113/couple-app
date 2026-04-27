@@ -68,9 +68,9 @@ class AnniversaryReminderService {
       // 计算提醒日期
       final targetDate = anniversary.date;
       final scheduledDate = DateTime(
-        reminderTime.year,
-        reminderTime.month,
-        reminderTime.day,
+        targetDate.year,
+        targetDate.month,
+        targetDate.day,
         reminderTime.hour,
         reminderTime.minute,
       );
@@ -269,14 +269,17 @@ class AnniversaryReminderService {
   /// 请求通知权限（iOS）
   Future<bool> requestPermissions() async {
     try {
-      final result = await _notifications
-          .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()
-          ?.requestPermissions(
-            alert: true,
-            badge: true,
-            sound: true,
-          );
-      return result ?? false;
+      final iosPlugin = _notifications
+          .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>();
+      if (iosPlugin != null) {
+        final result = await iosPlugin.requestPermissions(
+          alert: true,
+          badge: true,
+          sound: true,
+        );
+        return result ?? false;
+      }
+      return true;
     } catch (e) {
       return false;
     }
